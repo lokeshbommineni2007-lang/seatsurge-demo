@@ -14,6 +14,8 @@ import {
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 const BOT_SERVICE_URL = (import.meta as any).env?.VITE_BOT_SERVICE_URL || 'https://seatsurge-bot-screener.onrender.com';
+// Primary centralized distributed locking & bot detection engine (Render FastAPI)
+const ENGINE_API = BOT_SERVICE_URL || API_BASE;
 
 type BookingStep = 'SELECT' | 'DETAIL' | 'SEATS' | 'PAY' | 'TICKET';
 
@@ -64,8 +66,18 @@ export function App() {
   const [queueWaitSeconds, setQueueWaitSeconds] = useState(12);
   const [isQueueAdmitted, setIsQueueAdmitted] = useState(false);
 
-  // Observability & Bot defense
-  const [userId] = useState(() => `user-${Math.random().toString(36).substring(2, 9)}`);
+  // Observability & Bot defense - Session-persistent User ID so tab refreshes keep holds while separate laptops get unique IDs
+  const [userId] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem('seatsurge_uid');
+      if (stored) return stored;
+      const newId = `client-${Math.random().toString(36).substring(2, 9)}`;
+      sessionStorage.setItem('seatsurge_uid', newId);
+      return newId;
+    } catch {
+      return `client-${Math.random().toString(36).substring(2, 9)}`;
+    }
+  });
   const [metrics, setMetrics] = useState<any>({
     instanceId: 'seatsurge-worker-prod-01 (Nginx LB)',
     connectedClients: 842,
@@ -110,79 +122,73 @@ export function App() {
     return seats.reduce((total, id) => total + getSeatPrice(id), 0);
   };
 
-  // 1. Initial Seat Fetch
+  // 1. Central Distributed Engine Sync (Polls GET /seats every 1.2s across all laptops)
   const fetchSeats = async () => {
     try {
-      const res = await fetch(`${API_BASE}/seats`);
+      const res = await fetch(`${ENGINE_API}/seats`);
       if (res.ok) {
         const data = await res.json();
-        const map = new Map<string, SeatInfo>();
-        data.seats.forEach((s: SeatInfo) => map.set(s.seat_id, s));
-        setSeatsMap(map);
+        const remoteSeats: Array<{ seat_id: string; status: 'HELD' | 'SOLD'; held_by: string; expires_at: number | null }> = data.seats || [];
+        
+        setSeatsMap((prev) => {
+          const updated = new Map(prev);
+          remoteSeats.forEach((rem) => {
+            const existing = updated.get(rem.seat_id);
+            if (existing) {
+              updated.set(rem.seat_id, {
+                ...existing,
+                status: rem.status,
+                held_by: rem.held_by,
+                expires_at: rem.expires_at || undefined
+              });
+            } else {
+              const row = rem.seat_id.split('-')[0] || rem.seat_id[0] || 'A';
+              const num = parseInt(rem.seat_id.split('-')[1] || rem.seat_id.slice(1)) || 1;
+              updated.set(rem.seat_id, {
+                seat_id: rem.seat_id,
+                row,
+                number: num,
+                tier: 'PREMIUM',
+                price: 350,
+                status: rem.status,
+                held_by: rem.held_by,
+                expires_at: rem.expires_at || undefined
+              });
+            }
+          });
+          return updated;
+        });
+
+        // Strict Mutual Exclusion Check:
+        // If another device claimed any of our selected seats, revoke immediately
+        setSelectedSeats((prev) => {
+          const valid = prev.filter((sId) => {
+            const rem = remoteSeats.find((r) => r.seat_id === sId);
+            if (rem && rem.held_by !== userId && rem.status !== 'AVAILABLE') {
+              setErrorMessage(`⚠️ Seat ${sId} was just claimed by another device! Zero double bookings permitted.`);
+              return false;
+            }
+            return true;
+          });
+          return valid;
+        });
+
+        // Synchronize Admin metrics
+        setMetrics((prev: any) => ({
+          ...prev,
+          activeHolds: data.total_held ?? prev.activeHolds,
+          connectedClients: 842 + (data.total_held || 0) * 3
+        }));
       }
     } catch (err) {}
   };
 
-  // 2. WebSocket Connection
+  // 2. Real-Time Distributed Synchronization Loop (Every 1200ms)
   useEffect(() => {
-    let ws: WebSocket | null = null;
-    let reconnectTimeout: any = null;
-
-    const connectWs = () => {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws`;
-      ws = new WebSocket(wsUrl);
-
-      ws.onopen = () => {
-        fetchSeats();
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const msg = JSON.parse(event.data);
-          if (msg.type === 'SEAT_UPDATE') {
-            setSeatsMap((prev) => {
-              const updated = new Map(prev);
-              const existing = updated.get(msg.seat_id);
-              if (existing) {
-                updated.set(msg.seat_id, {
-                  ...existing,
-                  status: msg.status,
-                  held_by: msg.held_by,
-                  expires_at: msg.expires_at
-                });
-              }
-              return updated;
-            });
-
-            if (msg.status !== 'AVAILABLE' && msg.held_by !== userId) {
-              setSelectedSeats((prev) => {
-                if (prev.includes(msg.seat_id)) {
-                  setErrorMessage(`Seat ${msg.seat_id} was claimed by another user.`);
-                  return prev.filter((id) => id !== msg.seat_id);
-                }
-                return prev;
-              });
-            }
-          } else if (msg.type === 'VENUE_RESET') {
-            fetchSeats();
-            setSelectedSeats([]);
-            setActiveSeatId(null);
-          }
-        } catch (e) {}
-      };
-
-      ws.onclose = () => {
-        reconnectTimeout = setTimeout(connectWs, 2000);
-      };
-    };
-
-    connectWs();
-    return () => {
-      if (ws) ws.close();
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-    };
-  }, [userId]);
+    fetchSeats();
+    const interval = setInterval(fetchSeats, 1200);
+    return () => clearInterval(interval);
+  }, [userId, selectedLayoutId, currentStep]);
 
   // 3. Real-time Hold Timer Countdown
   useEffect(() => {
@@ -327,12 +333,13 @@ export function App() {
       }
     }
 
-    const seat = seatsMap.get(seatId);
-    if (seat && (seat.status === 'SOLD' || (seat.status === 'HELD' && seat.held_by !== userId))) {
-      setErrorMessage(`Seat ${seatId} is unavailable.`);
+    const currentSeat = seatsMap.get(seatId);
+    if (currentSeat && (currentSeat.status === 'SOLD' || (currentSeat.status === 'HELD' && currentSeat.held_by !== userId))) {
+      setErrorMessage(`⚠️ Seat ${seatId} is already held or booked by another device. Zero double bookings permitted.`);
       return;
     }
 
+    // ─── 1. DESELECTION (Release Atomic Hold on Render Backend) ───
     if (selectedSeats.includes(seatId)) {
       setSelectedSeats((prev) => prev.filter((id) => id !== seatId));
       if (activeSeatId === seatId) setActiveSeatId(null);
@@ -344,6 +351,14 @@ export function App() {
         }
         return updated;
       });
+
+      try {
+        await fetch(`${ENGINE_API}/seats/release`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ seat_id: seatId, user_id: userId })
+        });
+      } catch (e) {}
       return;
     }
 
@@ -352,37 +367,53 @@ export function App() {
       return;
     }
 
-    // Hold Seat in Local State
+    // ─── 2. SELECTION (Acquire Exclusive Distributed Mutex Hold) ───
     setErrorMessage(null);
-    setSelectedSeats((prev) => [...prev, seatId]);
-    setActiveSeatId(seatId);
-
-    const expiresAt = Date.now() + 120 * 1000;
-    setHoldExpiresAt(expiresAt);
-    setHoldTimerSeconds(120);
-
-    setSeatsMap((prev) => {
-      const updated = new Map(prev);
-      const existing = updated.get(seatId);
-      if (existing) {
-        updated.set(seatId, {
-          ...existing,
-          status: 'HELD',
-          held_by: userId,
-          expires_at: expiresAt
-        });
-      }
-      return updated;
-    });
-
-    // Try sync with backend Redis
     try {
-      fetch(`${API_BASE}/seats/hold`, {
+      const res = await fetch(`${ENGINE_API}/seats/hold`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ seat_id: seatId, user_id: userId })
-      }).catch(() => {});
-    } catch (e) {}
+        body: JSON.stringify({
+          seat_id: seatId,
+          user_id: userId,
+          event_id: selectedEvent.id
+        })
+      });
+
+      if (!res.ok) {
+        // HTTP 409 Conflict: Another device holds or booked this seat!
+        const errJson = await res.json().catch(() => ({}));
+        const detailMsg = errJson.detail || `⚠️ Seat ${seatId} is already held or booked by another device. Zero double bookings permitted.`;
+        setErrorMessage(detailMsg);
+        await fetchSeats();
+        return; // BLOCK SELECTION
+      }
+
+      const holdData = await res.json();
+      const expiresAt = holdData.expires_at || Date.now() + 120 * 1000;
+
+      // Exclusive lock acquired!
+      setSelectedSeats((prev) => [...prev, seatId]);
+      setActiveSeatId(seatId);
+      setHoldExpiresAt(expiresAt);
+      setHoldTimerSeconds(120);
+
+      setSeatsMap((prev) => {
+        const updated = new Map(prev);
+        const existing = updated.get(seatId);
+        if (existing) {
+          updated.set(seatId, {
+            ...existing,
+            status: 'HELD',
+            held_by: userId,
+            expires_at: expiresAt
+          });
+        }
+        return updated;
+      });
+    } catch (e: any) {
+      setErrorMessage(`Lock acquisition failed: ${e.message}`);
+    }
   };
 
   // Proceed to Step 4: Pay
@@ -401,9 +432,9 @@ export function App() {
     const booked = [...selectedSeats];
     const amount = calculateTotalPrice(booked);
 
-    // Call payment checkout
+    // Call Central Distributed Engine Checkout with Atomic Verification
     try {
-      await fetch(`${API_BASE}/checkout`, {
+      const res = await fetch(`${ENGINE_API}/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -413,16 +444,22 @@ export function App() {
           total_price: amount
         })
       });
-    } catch (e) {}
 
-    setTimeout(() => {
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Checkout rejected by atomic engine: ${errData.detail || 'One or more seats are no longer available.'}`);
+        await fetchSeats();
+        setIsProcessingPayment(false);
+        return;
+      }
+
       setIsProcessingPayment(false);
       setSeatsMap((prev) => {
         const updated = new Map(prev);
         booked.forEach((sId) => {
           const existing = updated.get(sId);
           if (existing) {
-            updated.set(sId, { ...existing, status: 'SOLD', held_by: undefined });
+            updated.set(sId, { ...existing, status: 'SOLD', held_by: userId });
           }
         });
         return updated;
@@ -444,7 +481,10 @@ export function App() {
       setHoldExpiresAt(null);
       setCurrentStep('TICKET');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 800);
+    } catch (e: any) {
+      alert(`Checkout network error: ${e.message}`);
+      setIsProcessingPayment(false);
+    }
   };
 
   // Simulate Bot Attack
@@ -902,6 +942,23 @@ export function App() {
             </div>
           </div>
 
+          {/* Real-Time Double-Booking Prevention Banner */}
+          {errorMessage && (
+            <div className="mb-8 p-5 rounded-2xl bg-[#fee2e2] border-2 border-[#ef4444] text-[#991b1b] flex items-center justify-between gap-4 shadow-lg animate-bounce">
+              <div className="flex items-center gap-3.5">
+                <AlertCircle className="w-6 h-6 text-[#dc2626] shrink-0" />
+                <span className="text-sm sm:text-base font-black tracking-tight">{errorMessage}</span>
+              </div>
+              <button 
+                onClick={() => setErrorMessage(null)} 
+                className="p-2 rounded-xl hover:bg-[#fecaca] text-[#dc2626] transition cursor-pointer"
+                title="Dismiss"
+              >
+                <X className="w-5 h-5 stroke-[2.5]" />
+              </button>
+            </div>
+          )}
+
           {/* Main Seating Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             
@@ -910,11 +967,11 @@ export function App() {
               <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div>
                   <h2 className="text-2xl font-black text-[#231815]">Auditorium Screen & Seating</h2>
-                  <div className="text-xs font-bold text-[#8c776e] mt-1">Click chairs to select (Max 6 seats)</div>
+                  <div className="text-xs font-bold text-[#8c776e] mt-1">Real-time synchronized across all devices (Max 6 seats)</div>
                 </div>
 
                 {/* Legend */}
-                <div className="flex items-center gap-5 text-xs font-black text-[#6e5c54]">
+                <div className="flex flex-wrap items-center gap-4 text-xs font-black text-[#6e5c54]">
                   <div className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-lg bg-[#22c55e] border border-[#16a34a]" />
                     <span>Available</span>
@@ -922,6 +979,10 @@ export function App() {
                   <div className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-lg bg-[#f59e0b] border border-[#d97706]" />
                     <span>Selected</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-lg bg-[#fb7185] border border-[#e11d48] animate-pulse" />
+                    <span>Held (Other Device)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-lg bg-[#f87171] border border-[#ef4444]" />
@@ -943,28 +1004,39 @@ export function App() {
                     </div>
                   </div>
 
-                  {/* Seat Rows Grid with clear spacing */}
+                  {/* Seat Rows Grid with real-time atomic locking */}
                   <div className="space-y-3.5 overflow-x-auto pb-4 max-w-full">
                     {['A', 'B', 'C', 'D', 'E'].map((rowLetter) => (
                       <div key={rowLetter} className="flex items-center gap-3 justify-center">
                         <span className="w-6 text-sm font-black text-[#8c776e] text-center font-mono">{rowLetter}</span>
                         {Array.from({ length: 12 }, (_, i) => i + 1).map((seatNum) => {
-                          const seatId = `${rowLetter}${seatNum}`;
+                          const seatId = `${rowLetter}-${seatNum}`;
+                          const seat = seatsMap.get(seatId);
                           const isSelected = selectedSeats.includes(seatId);
-                          const isSold = ['A2', 'B3', 'B5', 'D2', 'D3', 'D11', 'E2', 'E5', 'E7'].includes(seatId);
+                          const isSold = seat?.status === 'SOLD';
+                          const isHeldOther = seat?.status === 'HELD' && seat?.held_by !== userId;
+                          const isHeldMine = seat?.status === 'HELD' && seat?.held_by === userId;
 
                           let styleClasses = 'bg-[#4ade80] hover:bg-[#22c55e] text-slate-900 border border-[#22c55e]';
+                          let tooltip = `Seat ${seatId} - Available (₹${getSeatPrice(seatId)})`;
+
                           if (isSold) {
                             styleClasses = 'bg-[#f87171] text-white opacity-85 cursor-not-allowed border border-[#ef4444]';
-                          } else if (isSelected) {
-                            styleClasses = 'bg-[#f59e0b] text-white font-black ring-3 ring-[#c85a3b] scale-110 shadow-md border border-[#d97706]';
+                            tooltip = `Seat ${seatId} - SOLD`;
+                          } else if (isHeldOther) {
+                            styleClasses = 'bg-[#fb7185] text-white opacity-90 cursor-not-allowed border-2 border-[#e11d48] animate-pulse';
+                            tooltip = `Seat ${seatId} - Locked by another device`;
+                          } else if (isSelected || isHeldMine) {
+                            styleClasses = 'bg-[#f59e0b] text-white font-black ring-4 ring-[#c85a3b] scale-110 shadow-md border border-[#d97706]';
+                            tooltip = `Seat ${seatId} - Held by you (Exclusive Lock)`;
                           }
 
                           return (
                             <button
                               key={seatId}
-                              disabled={isSold}
+                              disabled={isSold || isHeldOther}
                               onClick={() => handleToggleSeat(seatId)}
+                              title={tooltip}
                               className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-xs font-black font-mono transition-all flex items-center justify-center cursor-pointer ${styleClasses}`}
                             >
                               {seatId}
@@ -1447,7 +1519,10 @@ export function App() {
             botsBlocked: (prev?.botsBlocked || 54) + 1
           }));
         }}
-        onResetVenue={() => {
+        onResetVenue={async () => {
+          try {
+            await fetch(`${ENGINE_API}/seats/reset`, { method: 'POST' });
+          } catch (e) {}
           setSelectedSeats([]);
           setActiveSeatId(null);
           setHoldExpiresAt(null);
@@ -1456,7 +1531,8 @@ export function App() {
             ...prev,
             activeHolds: 0
           }));
-          alert('🔄 Venue Reset: All seat holds released back to venue!');
+          await fetchSeats();
+          alert('🔄 Venue Reset: All seat holds and bookings cleared across all devices!');
         }}
       />
 
