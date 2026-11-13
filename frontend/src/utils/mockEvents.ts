@@ -14,7 +14,7 @@ export interface EventItem {
   id: string;
   title: string;
   subtitle: string;
-  category: 'Concerts' | 'Movies' | 'Sports' | 'Comedy';
+  category: 'Concerts' | 'Movies';
   genre: string[];
   venue: string;
   location: string;
@@ -34,56 +34,155 @@ export interface EventItem {
   totalSeats: number;
 }
 
-// Fallback high-contrast SVG posters if external images fail or are offline
+// Fallback high-contrast SVG posters matching official BookMyShow reference artwork
 export function getFallbackPoster(title: string, category: string, primaryColor = '#e11d48'): string {
+  const isScene = title.toLowerCase().includes('scene');
+  const isRamayana = title.toLowerCase().includes('ramayana');
+  const isDnk = title.toLowerCase().includes('dnk') || title.toLowerCase().includes('donga');
+  const isArjuna = title.toLowerCase().includes('arjuna');
+
+  if (isScene) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+      <defs>
+        <linearGradient id="scBg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#090a0f"/>
+          <stop offset="40%" stop-color="#1c1114"/>
+          <stop offset="100%" stop-color="#06070a"/>
+        </linearGradient>
+        <radialGradient id="scGlow" cx="50%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="600" height="900" fill="url(#scBg)"/>
+      <rect width="600" height="900" fill="url(#scGlow)"/>
+      <circle cx="300" cy="320" r="130" fill="#dc2626" fill-opacity="0.12" stroke="#ef4444" stroke-width="2"/>
+      <text x="300" y="340" fill="#fca5a5" font-size="70" text-anchor="middle">🚨</text>
+      <text x="300" y="470" fill="#ef4444" font-size="68" font-weight="900" font-family="'Impact', 'Arial Black', sans-serif" letter-spacing="8" text-anchor="middle" stroke="#7f1d1d" stroke-width="3">SCENE</text>
+      <text x="300" y="520" fill="#f87171" font-size="18" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="4" text-anchor="middle">SURIYA AS INSP. INBARAJ</text>
+      <text x="300" y="555" fill="#cbd5e1" font-size="14" font-weight="600" font-family="monospace" text-anchor="middle">ACTION • COMEDY • DRAMA</text>
+      
+      <rect x="180" y="600" width="240" height="42" rx="21" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="2"/>
+      <text x="300" y="627" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⭐ 9.0/10 (135K+ VOTES)</text>
+      <text x="300" y="700" fill="#94a3b8" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">PRASADS SCREEN 4 • BARCO 4K</text>
+    </svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+
+  if (isRamayana) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+      <defs>
+        <linearGradient id="rmBg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1a0b02"/>
+          <stop offset="50%" stop-color="#2d1303"/>
+          <stop offset="100%" stop-color="#0a0502"/>
+        </linearGradient>
+        <radialGradient id="rmGlow" cx="50%" cy="30%" r="55%">
+          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="600" height="900" fill="url(#rmBg)"/>
+      <rect width="600" height="900" fill="url(#rmGlow)"/>
+      <circle cx="300" cy="320" r="130" fill="#f59e0b" fill-opacity="0.15" stroke="#fbbf24" stroke-width="2"/>
+      <text x="300" y="340" fill="#fbbf24" font-size="70" text-anchor="middle">🏹</text>
+      <text x="300" y="465" fill="#fef08a" font-size="52" font-weight="900" font-family="'Cinzel', 'Times New Roman', serif" letter-spacing="6" text-anchor="middle" stroke="#b45309" stroke-width="2">RAMAYANA</text>
+      <text x="300" y="515" fill="#fde047" font-size="16" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="5" text-anchor="middle">THE EPIC 3D SAGA</text>
+      <text x="300" y="555" fill="#fef3c7" font-size="13" font-weight="600" font-family="monospace" text-anchor="middle">NITESH TIWARI • TELUGU / HINDI</text>
+
+      <rect x="180" y="600" width="240" height="42" rx="21" fill="#f59e0b" fill-opacity="0.2" stroke="#f59e0b" stroke-width="2"/>
+      <text x="300" y="627" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⭐ 9.3/10 (301K+ VOTES)</text>
+      <text x="300" y="700" fill="#fde68a" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">PRASADS PCX GIANT SCREEN</text>
+    </svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+
+  if (isDnk) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+      <defs>
+        <linearGradient id="dnkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0b132b"/>
+          <stop offset="50%" stop-color="#1c2541"/>
+          <stop offset="100%" stop-color="#080d1a"/>
+        </linearGradient>
+        <radialGradient id="dnkGlow" cx="50%" cy="30%" r="55%">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="600" height="900" fill="url(#dnkBg)"/>
+      <rect width="600" height="900" fill="url(#dnkGlow)"/>
+      <circle cx="300" cy="320" r="130" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="2"/>
+      <text x="300" y="340" fill="#38bdf8" font-size="70" text-anchor="middle">🎭</text>
+      <text x="300" y="465" fill="#facc15" font-size="64" font-weight="900" font-family="'Impact', 'Arial Black', sans-serif" letter-spacing="6" text-anchor="middle" stroke="#854d0e" stroke-width="3">DNK</text>
+      <text x="300" y="515" fill="#fef08a" font-size="17" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="3" text-anchor="middle">DONGA NAA KODUKU</text>
+      <text x="300" y="555" fill="#93c5fd" font-size="13" font-weight="600" font-family="monospace" text-anchor="middle">COMEDY • CRIME ENTERTAINER</text>
+
+      <rect x="180" y="600" width="240" height="42" rx="21" fill="#0284c7" fill-opacity="0.25" stroke="#38bdf8" stroke-width="2"/>
+      <text x="300" y="627" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⭐ 9.2/10 (420+ VOTES)</text>
+      <text x="300" y="700" fill="#7dd3fc" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">ALLU CINEMAS KOKAPET • DOLBY</text>
+    </svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+
+  if (isArjuna) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+      <defs>
+        <linearGradient id="arjBg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#180d07"/>
+          <stop offset="50%" stop-color="#2a160a"/>
+          <stop offset="100%" stop-color="#0a0502"/>
+        </linearGradient>
+        <radialGradient id="arjGlow" cx="50%" cy="30%" r="55%">
+          <stop offset="0%" stop-color="#ea580c" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="600" height="900" fill="url(#arjBg)"/>
+      <rect width="600" height="900" fill="url(#arjGlow)"/>
+      <circle cx="300" cy="320" r="130" fill="#ea580c" fill-opacity="0.15" stroke="#f97316" stroke-width="2"/>
+      <text x="300" y="340" fill="#f97316" font-size="70" text-anchor="middle">⚔️</text>
+      <text x="300" y="465" fill="#ffedd5" font-size="52" font-weight="900" font-family="'Cinzel', 'Georgia', serif" letter-spacing="4" text-anchor="middle" stroke="#9a3412" stroke-width="2">ITLU ARJUNA</text>
+      <text x="300" y="515" fill="#fdba74" font-size="16" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="3" text-anchor="middle">ACTION • DRAMA • ROMANTIC</text>
+      <text x="300" y="555" fill="#fed7aa" font-size="13" font-weight="600" font-family="monospace" text-anchor="middle">SUKUMAR WRITINGS • TELUGU</text>
+
+      <rect x="180" y="600" width="240" height="42" rx="21" fill="#ea580c" fill-opacity="0.25" stroke="#f97316" stroke-width="2"/>
+      <text x="300" y="627" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⭐ 9.4/10 (810+ VOTES)</text>
+      <text x="300" y="700" fill="#fed7aa" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">AAA CINEMAS AMEERPET • ATMOS</text>
+    </svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+
+  // Anirudh Rockstar Concert
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
     <defs>
-      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#111827"/>
-        <stop offset="50%" stop-color="#0f172a"/>
-        <stop offset="100%" stop-color="#030712"/>
+      <linearGradient id="aniBg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#14061f"/>
+        <stop offset="50%" stop-color="#280e3d"/>
+        <stop offset="100%" stop-color="#07020d"/>
       </linearGradient>
-      <radialGradient id="glow" cx="50%" cy="30%" r="50%">
-        <stop offset="0%" stop-color="${primaryColor}" stop-opacity="0.35"/>
+      <radialGradient id="aniGlow" cx="50%" cy="30%" r="60%">
+        <stop offset="0%" stop-color="#a855f7" stop-opacity="0.5"/>
         <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
       </radialGradient>
     </defs>
-    <rect width="600" height="900" fill="url(#bg)"/>
-    <rect width="600" height="900" fill="url(#glow)"/>
-    <circle cx="300" cy="360" r="140" fill="${primaryColor}" fill-opacity="0.15" stroke="${primaryColor}" stroke-width="2"/>
-    <text x="300" y="375" fill="#f8fafc" font-size="56" font-weight="900" font-family="system-ui, sans-serif" text-anchor="middle">🎬</text>
-    <text x="300" y="540" fill="#f8fafc" font-size="34" font-weight="900" font-family="system-ui, sans-serif" text-anchor="middle">${title.length > 22 ? title.slice(0, 20) + '...' : title}</text>
-    <text x="300" y="590" fill="#94a3b8" font-size="18" font-weight="700" font-family="monospace" text-anchor="middle" letter-spacing="4">${category.toUpperCase()} • 3D ARENA</text>
-    <rect x="200" y="640" width="200" height="40" rx="20" fill="${primaryColor}" fill-opacity="0.2" stroke="${primaryColor}" stroke-width="1.5"/>
-    <text x="300" y="666" fill="#fecdd3" font-size="14" font-weight="800" font-family="monospace" text-anchor="middle">5,000 SEATS LIVE</text>
+    <rect width="600" height="900" fill="url(#aniBg)"/>
+    <rect width="600" height="900" fill="url(#aniGlow)"/>
+    <circle cx="300" cy="320" r="140" fill="#a855f7" fill-opacity="0.2" stroke="#c084fc" stroke-width="3"/>
+    <text x="300" y="345" fill="#f0abfc" font-size="80" text-anchor="middle">⚡</text>
+    <text x="300" y="465" fill="#fae8ff" font-size="56" font-weight="900" font-family="'Arial Black', sans-serif" letter-spacing="4" text-anchor="middle" stroke="#7e22ce" stroke-width="3">ANIRUDH</text>
+    <text x="300" y="515" fill="#e879f9" font-size="20" font-weight="900" font-family="system-ui, sans-serif" letter-spacing="6" text-anchor="middle">HUKUM WORLD TOUR</text>
+    <text x="300" y="555" fill="#d8b4fe" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">ROCKSTAR LIVE IN HYDERABAD</text>
+
+    <rect x="150" y="600" width="300" height="44" rx="22" fill="#9333ea" fill-opacity="0.3" stroke="#c084fc" stroke-width="2"/>
+    <text x="300" y="628" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⚡ 360° ROCKSTAR STADIUM</text>
+    <text x="300" y="700" fill="#e9d5ff" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">GMR ARENA • 1,200 SEATS LIVE</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+// EXACTLY 4 MOVIES & ONE AND ONLY ANIRUDH CONCERT
 export const HYDERABAD_EVENTS: EventItem[] = [
-  {
-    id: 'anirudh-hukum',
-    title: 'Anirudh: Hukum World Tour',
-    subtitle: 'Rockstar Anirudh Ravichander Live in Hyderabad • 360° Stadium Arena',
-    category: 'Concerts',
-    genre: ['Rockstar', 'EDM', 'Tamil/Telugu Rock', 'Live Stadium'],
-    venue: 'GMR Arena: 360° Rockstar Stadium',
-    location: 'Shamshabad, Hyderabad',
-    city: 'Hyderabad',
-    date: 'Sat, 14 Dec • 7:00 PM',
-    duration: '3h 45m',
-    ageRating: 'All Ages',
-    rating: 9.9,
-    votes: '520K',
-    languages: ['Tamil', 'Telugu', 'Hindi'],
-    formats: ['360° Rockstar Stage', 'Golden Fan Pit', 'Laser & Pyro Arena'],
-    priceStart: 999,
-    bannerImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1920&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80',
-    isFlashSale: true,
-    statusTag: '⚡ ROCKSTAR ANIRUDH LIVE',
-    totalSeats: 1200
-  },
   {
     id: 'ramayana-3d',
     title: 'Ramayana (3D) (Telugu)',
@@ -93,157 +192,115 @@ export const HYDERABAD_EVENTS: EventItem[] = [
     venue: 'Prasads Multiplex: PCX Screen',
     location: 'Necklace Road, Hyderabad',
     city: 'Hyderabad',
-    date: 'Fri, 13 Nov • Multiple Shows',
+    date: 'Fri, 13 Nov • 03:35 PM (PCX Screen)',
     duration: '3h 10m',
     ageRating: 'U',
-    rating: 9.9,
-    votes: '640K',
+    rating: 9.3,
+    votes: '301K+',
     languages: ['Telugu', 'Hindi', 'Tamil'],
-    formats: ['PCX Screen', 'Dolby Cinema 3D', 'Laser Dolby Atmos', 'Barco 4K Laser'],
+    formats: ['PCX Screen', 'Dolby Cinema 3D', 'Barco 4K Laser'],
     priceStart: 295,
     bannerImage: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=1920&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=800&q=80',
+    posterImage: getFallbackPoster('Ramayana', 'Movies'),
     isFlashSale: true,
-    statusTag: '🔥 HYDERABAD BLOCKBUSTER',
+    statusTag: '🔥 HYDERABAD PCX GIANT SCREEN',
     totalSeats: 1200
   },
   {
-    id: 'coldplay-hyd',
-    title: 'Coldplay: Music of the Spheres',
-    subtitle: 'World Tour 2026 • Live in Hyderabad',
-    category: 'Concerts',
-    genre: ['Alternative Rock', 'Pop', 'Arena'],
-    venue: 'Gachibowli Outdoor Stadium',
-    location: 'Gachibowli, Hyderabad',
-    city: 'Hyderabad',
-    date: 'Sun, 24 Nov • 7:00 PM',
-    duration: '3h 15m',
-    ageRating: 'All Ages',
-    rating: 9.8,
-    votes: '320K',
-    languages: ['English'],
-    formats: ['Live Concert', 'Stadium Tour', 'Laser Show'],
-    priceStart: 2500,
-    bannerImage: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1920&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80',
-    isFlashSale: true,
-    statusTag: 'FLASH SALE • 5,000 SEATS',
-    totalSeats: 5000
-  },
-  {
-    id: 'pushpa-2',
-    title: 'Pushpa 2: The Rule',
-    subtitle: 'Allu Arjun • Sukumar • Devi Sri Prasad',
+    id: 'scene-2026',
+    title: 'Scene',
+    subtitle: 'Suriya as Inspector Inbaraj • Action, Comedy & Drama',
     category: 'Movies',
-    genre: ['Action', 'Thriller', 'Drama'],
-    venue: 'Prasads Multiplex: Large Screen',
+    genre: ['Action', 'Comedy', 'Drama'],
+    venue: 'Prasads Multiplex: Screen 4',
     location: 'Necklace Road, Hyderabad',
     city: 'Hyderabad',
-    date: 'Daily • Multiple Shows',
-    duration: '3h 20m',
-    ageRating: 'U/A 16+',
-    rating: 9.5,
-    votes: '480K',
-    languages: ['Telugu', 'Hindi', 'Tamil'],
-    formats: ['IMAX 3D Laser', 'Dolby Atmos 7.1.4'],
-    priceStart: 350,
+    date: 'Fri, 13 Nov • 07:20 PM (Screen 4)',
+    duration: '2h 29m',
+    ageRating: 'UA16+',
+    rating: 9.0,
+    votes: '135K+',
+    languages: ['Tamil', 'Telugu'],
+    formats: ['2D', 'EPIQ', 'HDR By Barco', 'DOLBY CINEMA 2D'],
+    priceStart: 295,
     bannerImage: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80',
+    posterImage: getFallbackPoster('Scene', 'Movies'),
     isFlashSale: true,
-    statusTag: 'FAST FILLING',
-    totalSeats: 5000
+    statusTag: '🔥 SURIYA ACTION BLOCKBUSTER',
+    totalSeats: 500
   },
   {
-    id: 'srh-vs-csk',
-    title: 'Sunrisers Hyderabad vs CSK',
-    subtitle: 'IPL 2026 • Rajiv Gandhi Stadium, Uppal',
-    category: 'Sports',
-    genre: ['Cricket', 'T20', 'Tournament'],
-    venue: 'Rajiv Gandhi Int. Cricket Stadium',
-    location: 'Uppal, Hyderabad',
+    id: 'dnk-telugu',
+    title: 'DNK (Donga Naa Koduku)',
+    subtitle: 'Hilarious Crime Comedy • Telugu Blockbuster Family Entertainer',
+    category: 'Movies',
+    genre: ['Comedy', 'Crime'],
+    venue: 'ALLU Cinemas: Kokapet',
+    location: 'Kokapet, Hyderabad',
     city: 'Hyderabad',
-    date: 'Fri, 29 Nov • 7:30 PM',
+    date: 'Fri, 13 Nov • 07:25 PM (Dolby Cinema)',
+    duration: '2h 15m',
+    ageRating: 'U/A',
+    rating: 9.2,
+    votes: '420+',
+    languages: ['Telugu'],
+    formats: ['Dolby Cinema 3D', '4K Dual Laser HDR'],
+    priceStart: 395,
+    bannerImage: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1920&q=80',
+    posterImage: getFallbackPoster('DNK', 'Movies'),
+    isFlashSale: true,
+    statusTag: '⭐ ALLU KOKAPET DIRECTOR CHOICE',
+    totalSeats: 600
+  },
+  {
+    id: 'itlu-arjuna',
+    title: 'Itlu Arjuna',
+    subtitle: 'Intense Romantic Action Drama • Sukumar Writings',
+    category: 'Movies',
+    genre: ['Action', 'Drama', 'Romantic'],
+    venue: 'AAA Cinemas: Ameerpet',
+    location: 'Ameerpet Metro Hub, Hyderabad',
+    city: 'Hyderabad',
+    date: 'Fri, 13 Nov • 12:05 PM (Laser Atmos)',
+    duration: '2h 35m',
+    ageRating: 'U/A',
+    rating: 9.4,
+    votes: '810+',
+    languages: ['Telugu'],
+    formats: ['Screen 1 • Laser Dolby Atmos', 'Barco RGB Laser'],
+    priceStart: 295,
+    bannerImage: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1920&q=80',
+    posterImage: getFallbackPoster('Itlu Arjuna', 'Movies'),
+    isFlashSale: true,
+    statusTag: '👑 AAA CINEMAS RECLINER PODS',
+    totalSeats: 650
+  },
+  {
+    id: 'anirudh-hukum',
+    title: 'Anirudh: Hukum World Tour',
+    subtitle: 'Rockstar Anirudh Ravichander Live in Hyderabad • 360° Stadium Arena',
+    category: 'Concerts',
+    genre: ['Rockstar', 'EDM', 'Tamil/Telugu Rock', 'Live Stadium'],
+    venue: 'GMR Arena: 360° Rockstar Stadium',
+    location: 'Shamshabad, Hyderabad',
+    city: 'Hyderabad',
+    date: 'Sat, 28 Nov • 07:00 PM',
     duration: '3h 45m',
     ageRating: 'All Ages',
-    rating: 9.7,
-    votes: '210K',
-    languages: ['Telugu', 'English', 'Hindi'],
-    formats: ['Stands', 'Corporate Box', 'Pavilion Terrace'],
-    priceStart: 950,
-    bannerImage: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1920&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=800&q=80',
-    isFlashSale: false,
-    statusTag: 'SELLING OUT',
-    totalSeats: 5000
-  },
-  {
-    id: 'arijit-singh',
-    title: 'Arijit Singh: Symphony Tour',
-    subtitle: 'Live with 60-Piece Global Symphony Orchestra',
-    category: 'Concerts',
-    genre: ['Bollywood', 'Classical', 'Soul'],
-    venue: 'GMR Arena, Shamshabad',
-    location: 'Airport Approach Road, Hyderabad',
-    city: 'Hyderabad',
-    date: 'Sat, 7 Dec • 6:30 PM',
-    duration: '3h 30m',
-    ageRating: 'All Ages',
-    rating: 9.6,
-    votes: '145K',
-    languages: ['Hindi', 'Bengali', 'Telugu'],
-    formats: ['Open Air Amphitheatre', 'VIP Lounge'],
-    priceStart: 1800,
-    bannerImage: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1920&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=800&q=80',
-    isFlashSale: false,
-    totalSeats: 5000
-  },
-  {
-    id: 'zakir-khan',
-    title: 'Zakir Khan: Live Special',
-    subtitle: 'Tathastu & Beyond • Exclusive Hyderabad Standup',
-    category: 'Comedy',
-    genre: ['Stand-Up', 'Storytelling', 'Hindi Comedy'],
-    venue: 'Shilpakala Vedika',
-    location: 'Hitec City, Hyderabad',
-    city: 'Hyderabad',
-    date: 'Sat, 30 Nov • 8:00 PM',
-    duration: '2h 00m',
-    ageRating: '16+',
-    rating: 9.4,
-    votes: '62K',
-    languages: ['Hindi'],
-    formats: ['Live Auditorium', 'Balcony & Stalls'],
-    priceStart: 799,
-    bannerImage: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=1920&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&w=800&q=80',
-    isFlashSale: false,
-    totalSeats: 5000
-  },
-  {
-    id: 'devara',
-    title: 'Devara: Part 1 (IMAX Laser)',
-    subtitle: 'Jr NTR • Saif Ali Khan • Janhvi Kapoor',
-    category: 'Movies',
-    genre: ['Action', 'Epic', 'Drama'],
-    venue: 'AMB Cinemas: Screen 1 VIP',
-    location: 'Gachibowli, Hyderabad',
-    city: 'Hyderabad',
-    date: 'Daily • 5 Shows',
-    duration: '2h 58m',
-    ageRating: 'U/A 16+',
-    rating: 9.2,
-    votes: '390K',
-    languages: ['Telugu', 'Hindi'],
-    formats: ['Dolby Cinema 4K Laser', 'VIP Recliner'],
-    priceStart: 295,
-    bannerImage: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1920&q=80',
-    posterImage: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80',
-    isFlashSale: false,
-    totalSeats: 5000
+    rating: 9.9,
+    votes: '520K+',
+    languages: ['Tamil', 'Telugu', 'Hindi'],
+    formats: ['360° Rockstar Stage', 'Fan Pit', 'Golden Circle', 'VIP Lounge'],
+    priceStart: 1299,
+    bannerImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1920&q=80',
+    posterImage: getFallbackPoster('Anirudh: Hukum World Tour', 'Concerts'),
+    isFlashSale: true,
+    statusTag: '⚡ ROCKSTAR ANIRUDH LIVE • HYDERABAD',
+    totalSeats: 1200
   }
 ];
 
+// EXACTLY 4 AUDIS FOR THE 4 MOVIE SHOWS + 1 ROCKSTAR CONCERT STADIUM
 export const HYDERABAD_THEATRES: TheatreItem[] = [
   {
     id: 'prasads-pcx',
@@ -254,7 +311,7 @@ export const HYDERABAD_THEATRES: TheatreItem[] = [
     amenities: ['100ft Curved PCX Giant Screen', 'Barco 4K Laser', 'Dolby Atmos 7.1.4', 'Dual Glass Amphitheater'],
     timings: [
       { time: '12:00 PM', format: 'Barco 4K Laser', state: 'available' },
-      { time: '03:35 PM', format: 'PCX Screen', state: 'flash_sale', label: '🔥 PCX SCREEN' },
+      { time: '03:35 PM', format: 'PCX Screen', state: 'flash_sale', label: '🔥 RAMAYANA PCX' },
       { time: '07:20 PM', format: 'Barco 4K Laser', state: 'flash_sale', label: '⚡ FLASH SALE' },
       { time: '11:00 PM', format: 'Barco 4K Laser', state: 'available' }
     ]
@@ -269,7 +326,7 @@ export const HYDERABAD_THEATRES: TheatreItem[] = [
     timings: [
       { time: '11:00 AM', format: 'Barco 4K Laser', state: 'available' },
       { time: '02:30 PM', format: 'Barco 4K Laser', state: 'available' },
-      { time: '07:20 PM', format: 'Barco 4K Laser', state: 'flash_sale', label: '⚡ FLASH SALE' },
+      { time: '07:20 PM', format: 'Barco 4K Laser', state: 'flash_sale', label: '⚡ SCENE SHOW' },
       { time: '10:45 PM', format: 'Barco 4K Laser', state: 'fast_filling' }
     ]
   },
@@ -283,7 +340,7 @@ export const HYDERABAD_THEATRES: TheatreItem[] = [
     timings: [
       { time: '11:30 AM', format: 'Dolby Cinema', state: 'available' },
       { time: '03:15 PM', format: 'Dolby Cinema', state: 'available' },
-      { time: '07:25 PM', format: 'Dolby Cinema 3D', state: 'flash_sale', label: '⭐ DIRECTOR CHOICE' },
+      { time: '07:25 PM', format: 'Dolby Cinema 3D', state: 'flash_sale', label: '⭐ DNK DIRECTOR CHOICE' },
       { time: '11:25 PM', format: 'Dolby Cinema', state: 'available' }
     ]
   },
@@ -296,7 +353,7 @@ export const HYDERABAD_THEATRES: TheatreItem[] = [
     amenities: ['Laser Dolby Atmos', 'Barco RGB 4K Laser', 'Motorized Recliner Pods', 'Front Row Loungers'],
     timings: [
       { time: '10:00 AM', format: 'Laser Dolby 7.1', state: 'available' },
-      { time: '12:05 PM', format: 'Laser Dolby Atmos', state: 'flash_sale', label: '⚡ ATMOS FLASH SALE' },
+      { time: '12:05 PM', format: 'Laser Dolby Atmos', state: 'flash_sale', label: '⚡ ITLU ARJUNA SHOW' },
       { time: '04:25 PM', format: 'Laser Dolby 7.1', state: 'available' },
       { time: '06:45 PM', format: 'Laser Dolby Atmos', state: 'fast_filling' },
       { time: '10:10 PM', format: 'Laser Dolby 7.1', state: 'available' }
@@ -308,24 +365,9 @@ export const HYDERABAD_THEATRES: TheatreItem[] = [
     location: 'Airport Approach Road, Shamshabad, Hyderabad',
     distance: '14.2 km',
     layoutId: 'CONCERT_STADIUM',
-    amenities: ['360° Rockstar Stage', '120kW L-Acoustics K1 Rig', 'Pyrotechnics & 40-Head Lasers'],
+    amenities: ['360° Rockstar Center Stage', '120kW L-Acoustics K1 Rig', 'Pyrotechnics & 40-Head Lasers'],
     timings: [
-      { time: '07:00 PM', format: '360° Rockstar Stage', state: 'flash_sale', label: '⚡ FLASH SALE' },
-      { time: '09:30 PM', format: 'Golden Pit Experience', state: 'flash_sale', label: '⚡ FAST FILLING' }
-    ]
-  },
-  {
-    id: 'amb',
-    name: 'AMB Cinemas: Screen 1 VIP',
-    location: 'Sarath City Capital Mall, Gachibowli',
-    distance: '8.4 km',
-    layoutId: 'ALLU_KOKAPET',
-    amenities: ['RGB Pure Laser', 'Dolby Atmos', 'M-Lounge Access'],
-    timings: [
-      { time: '11:15 AM', format: 'Dolby Atmos 4K', state: 'available' },
-      { time: '03:45 PM', format: 'Dolby Atmos 4K', state: 'available' },
-      { time: '07:30 PM', format: 'VIP Laser Lounge', state: 'flash_sale', label: 'HIGH DEMAND' },
-      { time: '10:50 PM', format: 'Dolby Atmos 4K', state: 'fast_filling' }
+      { time: '07:00 PM', format: '360° Rockstar Stage', state: 'flash_sale', label: '⚡ ANIRUDH HUKUM' }
     ]
   }
 ];

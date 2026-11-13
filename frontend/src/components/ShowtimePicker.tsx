@@ -97,7 +97,12 @@ export const ShowtimePicker: React.FC<ShowtimePickerProps> = ({
 
         {/* Theatres & Showtimes List */}
         <div className="p-6 overflow-y-auto space-y-5 flex-1">
-          {HYDERABAD_THEATRES.map((theatre) => (
+          {HYDERABAD_THEATRES.filter((theatre) => {
+            if (event.category === 'Concerts' || event.id.includes('anirudh')) {
+              return theatre.id === 'gmr-arena';
+            }
+            return theatre.id !== 'gmr-arena';
+          }).map((theatre) => (
             <div key={theatre.id} className="bg-[#121522] rounded-2xl p-5 border border-white/[0.07] hover:border-white/15 transition">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div>

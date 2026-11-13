@@ -33,8 +33,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { name: 'All Events', icon: Compass },
     { name: 'Movies', icon: Film },
     { name: 'Concerts', icon: Music },
-    { name: 'Sports', icon: Trophy },
-    { name: 'Comedy', icon: Laugh },
   ];
 
   return (
