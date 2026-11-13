@@ -1,79 +1,86 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --brand-primary: #c85a3b;
-    --brand-primary-hover: #b3472a;
-    --bg-main: #faf4eb;
-    --bg-card: #fff1e6;
-    --card-border: #f2d5c2;
-    --text-primary: #231815;
-    --text-secondary: #7d6b63;
-  }
-
-  body {
-    background-color: #faf4eb;
-    color: #231815;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-  }
-
-  /* Custom Warm Scrollbars */
-  ::-webkit-scrollbar {
-    width: 7px;
-    height: 7px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #faf4eb;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #e2cbbe;
-    border-radius: 9999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #c85a3b;
-  }
+:root {
+  --brand-primary: #c85a3b;
+  --brand-primary-hover: #b3472a;
+  --bg-main: #f8f2e8;
+  --bg-card: #fff8f2;
+  --border-warm: #e8c5ac;
+  --border-focus: #c85a3b;
+  --text-dark: #231815;
+  --text-muted: #6e5c54;
 }
 
-/* Warm Elegant Card Styles */
-.warm-card {
-  background-color: #fff1e6;
-  border: 1px solid #f2d5c2;
-  box-shadow: 0 10px 30px -10px rgba(184, 74, 44, 0.08);
+body {
+  background-color: #f8f2e8;
+  color: #231815;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-.warm-card-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.warm-card-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 36px -10px rgba(184, 74, 44, 0.16);
-  border-color: #e5bfa7;
+/* Explicit Clean Borders & Padding */
+.box-border-warm {
+  border: 2px solid #e8c5ac !important;
 }
 
-/* Terracotta Button */
-.btn-terracotta {
-  background-color: #c85a3b;
-  color: #ffffff;
-  transition: all 0.2s ease;
-}
-.btn-terracotta:hover {
-  background-color: #b3472a;
-  transform: translateY(-1px);
-}
-.btn-terracotta:active {
-  transform: translateY(0);
+.box-border-dashed {
+  border: 2px dashed #e8c5ac !important;
 }
 
-/* Pill Stepper styles */
-.step-pill-active {
-  background-color: #c85a3b;
-  color: #ffffff;
-  font-weight: 700;
+/* Ticket Notches / Cutouts */
+.ticket-notch {
+  position: relative;
 }
-.step-pill-inactive {
-  color: #8c776e;
-  font-weight: 500;
+
+.ticket-notch::before,
+.ticket-notch::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background-color: #f8f2e8;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.ticket-notch::before {
+  left: -14px;
+  border-right: 2px solid #e8c5ac;
+}
+
+.ticket-notch::after {
+  right: -14px;
+  border-left: 2px solid #e8c5ac;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f8f2e8;
+}
+::-webkit-scrollbar-thumb {
+  background: #debfa9;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c85a3b;
+}
+
+/* Animations */
+@keyframes pulse-gentle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 3s ease-in-out infinite;
 }

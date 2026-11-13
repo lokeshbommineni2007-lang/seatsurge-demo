@@ -34,7 +34,7 @@ export interface EventItem {
   totalSeats: number;
 }
 
-// Fallback high-contrast SVG posters matching official BookMyShow reference artwork
+// Crisp high-contrast SVG posters styled directly after BookMyShow reference artwork
 export function getFallbackPoster(title: string, category: string, primaryColor = '#e11d48'): string {
   const isScene = title.toLowerCase().includes('scene');
   const isRamayana = title.toLowerCase().includes('ramayana');
@@ -45,26 +45,25 @@ export function getFallbackPoster(title: string, category: string, primaryColor 
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
       <defs>
         <linearGradient id="scBg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#090a0f"/>
-          <stop offset="40%" stop-color="#1c1114"/>
-          <stop offset="100%" stop-color="#06070a"/>
+          <stop offset="0%" stop-color="#140a0c"/>
+          <stop offset="50%" stop-color="#2c1218"/>
+          <stop offset="100%" stop-color="#0a0507"/>
         </linearGradient>
-        <radialGradient id="scGlow" cx="50%" cy="35%" r="60%">
-          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"/>
+        <radialGradient id="scGlow" cx="50%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.45"/>
           <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
         </radialGradient>
       </defs>
       <rect width="600" height="900" fill="url(#scBg)"/>
       <rect width="600" height="900" fill="url(#scGlow)"/>
-      <circle cx="300" cy="320" r="130" fill="#dc2626" fill-opacity="0.12" stroke="#ef4444" stroke-width="2"/>
-      <text x="300" y="340" fill="#fca5a5" font-size="70" text-anchor="middle">🚨</text>
-      <text x="300" y="470" fill="#ef4444" font-size="68" font-weight="900" font-family="'Impact', 'Arial Black', sans-serif" letter-spacing="8" text-anchor="middle" stroke="#7f1d1d" stroke-width="3">SCENE</text>
-      <text x="300" y="520" fill="#f87171" font-size="18" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="4" text-anchor="middle">SURIYA AS INSP. INBARAJ</text>
-      <text x="300" y="555" fill="#cbd5e1" font-size="14" font-weight="600" font-family="monospace" text-anchor="middle">ACTION • COMEDY • DRAMA</text>
-      
-      <rect x="180" y="600" width="240" height="42" rx="21" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="2"/>
-      <text x="300" y="627" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⭐ 9.0/10 (135K+ VOTES)</text>
-      <text x="300" y="700" fill="#94a3b8" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">PRASADS SCREEN 4 • BARCO 4K</text>
+      <circle cx="300" cy="270" r="140" fill="#dc2626" fill-opacity="0.15" stroke="#ef4444" stroke-width="3"/>
+      <text x="300" y="295" fill="#fca5a5" font-size="90" text-anchor="middle">🚨</text>
+      <text x="300" y="460" fill="#ef4444" font-size="76" font-weight="900" font-family="'Impact', 'Arial Black', sans-serif" letter-spacing="8" text-anchor="middle" stroke="#7f1d1d" stroke-width="3">SCENE</text>
+      <text x="300" y="515" fill="#fca5a5" font-size="20" font-weight="900" font-family="system-ui, sans-serif" letter-spacing="4" text-anchor="middle">SURIYA AS INSP. INBARAJ</text>
+      <text x="300" y="555" fill="#fecaca" font-size="16" font-weight="700" font-family="system-ui, sans-serif" text-anchor="middle">ACTION • COMEDY • DRAMA</text>
+      <text x="300" y="595" fill="#fda4af" font-size="14" font-weight="800" font-family="monospace" text-anchor="middle">PRASADS SCREEN 4 • BARCO 4K</text>
+      <rect x="60" y="800" width="480" height="64" rx="20" fill="#000000" fill-opacity="0.9" stroke="#ef4444" stroke-width="2.5"/>
+      <text x="300" y="842" fill="#ffffff" font-size="24" font-weight="900" font-family="system-ui, sans-serif" text-anchor="middle">★ 9.0/10 (135K+ Votes)</text>
     </svg>`;
     return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   }
@@ -73,26 +72,25 @@ export function getFallbackPoster(title: string, category: string, primaryColor 
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
       <defs>
         <linearGradient id="rmBg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#1a0b02"/>
-          <stop offset="50%" stop-color="#2d1303"/>
-          <stop offset="100%" stop-color="#0a0502"/>
+          <stop offset="0%" stop-color="#1f0e03"/>
+          <stop offset="50%" stop-color="#3d1c07"/>
+          <stop offset="100%" stop-color="#0f0601"/>
         </linearGradient>
-        <radialGradient id="rmGlow" cx="50%" cy="30%" r="55%">
-          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.45"/>
+        <radialGradient id="rmGlow" cx="50%" cy="32%" r="65%">
+          <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/>
           <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
         </radialGradient>
       </defs>
       <rect width="600" height="900" fill="url(#rmBg)"/>
       <rect width="600" height="900" fill="url(#rmGlow)"/>
-      <circle cx="300" cy="320" r="130" fill="#f59e0b" fill-opacity="0.15" stroke="#fbbf24" stroke-width="2"/>
-      <text x="300" y="340" fill="#fbbf24" font-size="70" text-anchor="middle">🏹</text>
-      <text x="300" y="465" fill="#fef08a" font-size="52" font-weight="900" font-family="'Cinzel', 'Times New Roman', serif" letter-spacing="6" text-anchor="middle" stroke="#b45309" stroke-width="2">RAMAYANA</text>
-      <text x="300" y="515" fill="#fde047" font-size="16" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="5" text-anchor="middle">THE EPIC 3D SAGA</text>
-      <text x="300" y="555" fill="#fef3c7" font-size="13" font-weight="600" font-family="monospace" text-anchor="middle">NITESH TIWARI • TELUGU / HINDI</text>
-
-      <rect x="180" y="600" width="240" height="42" rx="21" fill="#f59e0b" fill-opacity="0.2" stroke="#f59e0b" stroke-width="2"/>
-      <text x="300" y="627" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⭐ 9.3/10 (301K+ VOTES)</text>
-      <text x="300" y="700" fill="#fde68a" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">PRASADS PCX GIANT SCREEN</text>
+      <circle cx="300" cy="270" r="140" fill="#f59e0b" fill-opacity="0.15" stroke="#fbbf24" stroke-width="3"/>
+      <text x="300" y="295" fill="#fbbf24" font-size="90" text-anchor="middle">🏹</text>
+      <text x="300" y="460" fill="#fef08a" font-size="64" font-weight="900" font-family="'Cinzel', 'Times New Roman', serif" letter-spacing="6" text-anchor="middle" stroke="#b45309" stroke-width="2">RAMAYANA</text>
+      <text x="300" y="515" fill="#fde047" font-size="20" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="5" text-anchor="middle">THE EPIC 3D SAGA</text>
+      <text x="300" y="555" fill="#fef3c7" font-size="16" font-weight="700" font-family="system-ui, sans-serif" text-anchor="middle">NITESH TIWARI • TELUGU / HINDI</text>
+      <text x="300" y="595" fill="#fde68a" font-size="14" font-weight="800" font-family="monospace" text-anchor="middle">PRASADS PCX GIANT SCREEN</text>
+      <rect x="60" y="800" width="480" height="64" rx="20" fill="#000000" fill-opacity="0.9" stroke="#fbbf24" stroke-width="2.5"/>
+      <text x="300" y="842" fill="#ffffff" font-size="24" font-weight="900" font-family="system-ui, sans-serif" text-anchor="middle">★ 9.3/10 (301K+ Votes)</text>
     </svg>`;
     return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   }
@@ -101,26 +99,25 @@ export function getFallbackPoster(title: string, category: string, primaryColor 
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
       <defs>
         <linearGradient id="dnkBg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#0b132b"/>
-          <stop offset="50%" stop-color="#1c2541"/>
-          <stop offset="100%" stop-color="#080d1a"/>
+          <stop offset="0%" stop-color="#07152d"/>
+          <stop offset="50%" stop-color="#142850"/>
+          <stop offset="100%" stop-color="#050e1f"/>
         </linearGradient>
-        <radialGradient id="dnkGlow" cx="50%" cy="30%" r="55%">
-          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.4"/>
+        <radialGradient id="dnkGlow" cx="50%" cy="32%" r="65%">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5"/>
           <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
         </radialGradient>
       </defs>
       <rect width="600" height="900" fill="url(#dnkBg)"/>
       <rect width="600" height="900" fill="url(#dnkGlow)"/>
-      <circle cx="300" cy="320" r="130" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="2"/>
-      <text x="300" y="340" fill="#38bdf8" font-size="70" text-anchor="middle">🎭</text>
-      <text x="300" y="465" fill="#facc15" font-size="64" font-weight="900" font-family="'Impact', 'Arial Black', sans-serif" letter-spacing="6" text-anchor="middle" stroke="#854d0e" stroke-width="3">DNK</text>
-      <text x="300" y="515" fill="#fef08a" font-size="17" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="3" text-anchor="middle">DONGA NAA KODUKU</text>
-      <text x="300" y="555" fill="#93c5fd" font-size="13" font-weight="600" font-family="monospace" text-anchor="middle">COMEDY • CRIME ENTERTAINER</text>
-
-      <rect x="180" y="600" width="240" height="42" rx="21" fill="#0284c7" fill-opacity="0.25" stroke="#38bdf8" stroke-width="2"/>
-      <text x="300" y="627" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⭐ 9.2/10 (420+ VOTES)</text>
-      <text x="300" y="700" fill="#7dd3fc" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">ALLU CINEMAS KOKAPET • DOLBY</text>
+      <circle cx="300" cy="270" r="140" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="3"/>
+      <text x="300" y="295" fill="#38bdf8" font-size="90" text-anchor="middle">🎭</text>
+      <text x="300" y="460" fill="#facc15" font-size="74" font-weight="900" font-family="'Impact', 'Arial Black', sans-serif" letter-spacing="6" text-anchor="middle" stroke="#854d0e" stroke-width="3">DNK</text>
+      <text x="300" y="515" fill="#fef08a" font-size="20" font-weight="900" font-family="system-ui, sans-serif" letter-spacing="3" text-anchor="middle">DONGA NAA KODUKU</text>
+      <text x="300" y="555" fill="#bae6fd" font-size="16" font-weight="700" font-family="system-ui, sans-serif" text-anchor="middle">COMEDY • CRIME ENTERTAINER</text>
+      <text x="300" y="595" fill="#7dd3fc" font-size="14" font-weight="800" font-family="monospace" text-anchor="middle">ALLU CINEMAS KOKAPET • DOLBY</text>
+      <rect x="60" y="800" width="480" height="64" rx="20" fill="#000000" fill-opacity="0.9" stroke="#38bdf8" stroke-width="2.5"/>
+      <text x="300" y="842" fill="#ffffff" font-size="24" font-weight="900" font-family="system-ui, sans-serif" text-anchor="middle">★ 9.2/10 (420+ Votes)</text>
     </svg>`;
     return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   }
@@ -129,26 +126,25 @@ export function getFallbackPoster(title: string, category: string, primaryColor 
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
       <defs>
         <linearGradient id="arjBg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#180d07"/>
-          <stop offset="50%" stop-color="#2a160a"/>
-          <stop offset="100%" stop-color="#0a0502"/>
+          <stop offset="0%" stop-color="#1c0f08"/>
+          <stop offset="50%" stop-color="#361a0c"/>
+          <stop offset="100%" stop-color="#0c0603"/>
         </linearGradient>
-        <radialGradient id="arjGlow" cx="50%" cy="30%" r="55%">
-          <stop offset="0%" stop-color="#ea580c" stop-opacity="0.4"/>
+        <radialGradient id="arjGlow" cx="50%" cy="32%" r="65%">
+          <stop offset="0%" stop-color="#ea580c" stop-opacity="0.5"/>
           <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
         </radialGradient>
       </defs>
       <rect width="600" height="900" fill="url(#arjBg)"/>
       <rect width="600" height="900" fill="url(#arjGlow)"/>
-      <circle cx="300" cy="320" r="130" fill="#ea580c" fill-opacity="0.15" stroke="#f97316" stroke-width="2"/>
-      <text x="300" y="340" fill="#f97316" font-size="70" text-anchor="middle">⚔️</text>
-      <text x="300" y="465" fill="#ffedd5" font-size="52" font-weight="900" font-family="'Cinzel', 'Georgia', serif" letter-spacing="4" text-anchor="middle" stroke="#9a3412" stroke-width="2">ITLU ARJUNA</text>
-      <text x="300" y="515" fill="#fdba74" font-size="16" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="3" text-anchor="middle">ACTION • DRAMA • ROMANTIC</text>
-      <text x="300" y="555" fill="#fed7aa" font-size="13" font-weight="600" font-family="monospace" text-anchor="middle">SUKUMAR WRITINGS • TELUGU</text>
-
-      <rect x="180" y="600" width="240" height="42" rx="21" fill="#ea580c" fill-opacity="0.25" stroke="#f97316" stroke-width="2"/>
-      <text x="300" y="627" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⭐ 9.4/10 (810+ VOTES)</text>
-      <text x="300" y="700" fill="#fed7aa" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">AAA CINEMAS AMEERPET • ATMOS</text>
+      <circle cx="300" cy="270" r="140" fill="#ea580c" fill-opacity="0.15" stroke="#f97316" stroke-width="3"/>
+      <text x="300" y="295" fill="#f97316" font-size="90" text-anchor="middle">⚔️</text>
+      <text x="300" y="460" fill="#ffedd5" font-size="58" font-weight="900" font-family="'Cinzel', 'Georgia', serif" letter-spacing="4" text-anchor="middle" stroke="#9a3412" stroke-width="2">ITLU ARJUNA</text>
+      <text x="300" y="515" fill="#fdba74" font-size="20" font-weight="800" font-family="system-ui, sans-serif" letter-spacing="3" text-anchor="middle">ACTION • DRAMA • ROMANTIC</text>
+      <text x="300" y="555" fill="#fed7aa" font-size="16" font-weight="700" font-family="system-ui, sans-serif" text-anchor="middle">SUKUMAR WRITINGS • TELUGU</text>
+      <text x="300" y="595" fill="#fdba74" font-size="14" font-weight="800" font-family="monospace" text-anchor="middle">AAA CINEMAS AMEERPET • ATMOS</text>
+      <rect x="60" y="800" width="480" height="64" rx="20" fill="#000000" fill-opacity="0.9" stroke="#ea580c" stroke-width="2.5"/>
+      <text x="300" y="842" fill="#ffffff" font-size="24" font-weight="900" font-family="system-ui, sans-serif" text-anchor="middle">★ 9.4/10 (810+ Votes)</text>
     </svg>`;
     return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   }
@@ -157,26 +153,25 @@ export function getFallbackPoster(title: string, category: string, primaryColor 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
     <defs>
       <linearGradient id="aniBg" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#14061f"/>
-        <stop offset="50%" stop-color="#280e3d"/>
-        <stop offset="100%" stop-color="#07020d"/>
+        <stop offset="0%" stop-color="#190726"/>
+        <stop offset="50%" stop-color="#341250"/>
+        <stop offset="100%" stop-color="#0a0310"/>
       </linearGradient>
-      <radialGradient id="aniGlow" cx="50%" cy="30%" r="60%">
-        <stop offset="0%" stop-color="#a855f7" stop-opacity="0.5"/>
+      <radialGradient id="aniGlow" cx="50%" cy="32%" r="70%">
+        <stop offset="0%" stop-color="#a855f7" stop-opacity="0.6"/>
         <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
       </radialGradient>
     </defs>
     <rect width="600" height="900" fill="url(#aniBg)"/>
     <rect width="600" height="900" fill="url(#aniGlow)"/>
-    <circle cx="300" cy="320" r="140" fill="#a855f7" fill-opacity="0.2" stroke="#c084fc" stroke-width="3"/>
-    <text x="300" y="345" fill="#f0abfc" font-size="80" text-anchor="middle">⚡</text>
-    <text x="300" y="465" fill="#fae8ff" font-size="56" font-weight="900" font-family="'Arial Black', sans-serif" letter-spacing="4" text-anchor="middle" stroke="#7e22ce" stroke-width="3">ANIRUDH</text>
-    <text x="300" y="515" fill="#e879f9" font-size="20" font-weight="900" font-family="system-ui, sans-serif" letter-spacing="6" text-anchor="middle">HUKUM WORLD TOUR</text>
-    <text x="300" y="555" fill="#d8b4fe" font-size="14" font-weight="700" font-family="monospace" text-anchor="middle">ROCKSTAR LIVE IN HYDERABAD</text>
-
-    <rect x="150" y="600" width="300" height="44" rx="22" fill="#9333ea" fill-opacity="0.3" stroke="#c084fc" stroke-width="2"/>
-    <text x="300" y="628" fill="#ffffff" font-size="14" font-weight="900" font-family="monospace" text-anchor="middle">⚡ 360° ROCKSTAR STADIUM</text>
-    <text x="300" y="700" fill="#e9d5ff" font-size="13" font-weight="700" font-family="monospace" text-anchor="middle">GMR ARENA • 1,200 SEATS LIVE</text>
+    <circle cx="300" cy="270" r="140" fill="#a855f7" fill-opacity="0.2" stroke="#c084fc" stroke-width="3"/>
+    <text x="300" y="295" fill="#f0abfc" font-size="100" text-anchor="middle">⚡</text>
+    <text x="300" y="460" fill="#fae8ff" font-size="64" font-weight="900" font-family="'Arial Black', sans-serif" letter-spacing="4" text-anchor="middle" stroke="#7e22ce" stroke-width="3">ANIRUDH</text>
+    <text x="300" y="515" fill="#e879f9" font-size="22" font-weight="900" font-family="system-ui, sans-serif" letter-spacing="5" text-anchor="middle">HUKUM WORLD TOUR</text>
+    <text x="300" y="555" fill="#d8b4fe" font-size="16" font-weight="700" font-family="system-ui, sans-serif" text-anchor="middle">ROCKSTAR LIVE IN HYDERABAD</text>
+    <text x="300" y="595" fill="#c084fc" font-size="14" font-weight="800" font-family="monospace" text-anchor="middle">GMR ARENA • 1,200 SEATS LIVE</text>
+    <rect x="60" y="800" width="480" height="64" rx="20" fill="#000000" fill-opacity="0.9" stroke="#a855f7" stroke-width="2.5"/>
+    <text x="300" y="842" fill="#ffffff" font-size="24" font-weight="900" font-family="system-ui, sans-serif" text-anchor="middle">★ 9.9/10 (520K+ Votes)</text>
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
@@ -190,7 +185,7 @@ export const HYDERABAD_EVENTS: EventItem[] = [
     category: 'Movies',
     genre: ['Mythological', 'Action', 'Epic Drama'],
     venue: 'Prasads Multiplex: PCX Screen',
-    location: 'Necklace Road, Hyderabad',
+    location: 'Necklace Road, Central Hyderabad',
     city: 'Hyderabad',
     date: 'Fri, 13 Nov • 03:35 PM (PCX Screen)',
     duration: '3h 10m',
@@ -213,7 +208,7 @@ export const HYDERABAD_EVENTS: EventItem[] = [
     category: 'Movies',
     genre: ['Action', 'Comedy', 'Drama'],
     venue: 'Prasads Multiplex: Screen 4',
-    location: 'Necklace Road, Hyderabad',
+    location: 'Necklace Road, Central Hyderabad',
     city: 'Hyderabad',
     date: 'Fri, 13 Nov • 07:20 PM (Screen 4)',
     duration: '2h 29m',
@@ -259,7 +254,7 @@ export const HYDERABAD_EVENTS: EventItem[] = [
     category: 'Movies',
     genre: ['Action', 'Drama', 'Romantic'],
     venue: 'AAA Cinemas: Ameerpet',
-    location: 'Ameerpet Metro Hub, Hyderabad',
+    location: 'Ameerpet Metro Interchange Hub, Hyderabad',
     city: 'Hyderabad',
     date: 'Fri, 13 Nov • 12:05 PM (Laser Atmos)',
     duration: '2h 35m',
@@ -282,7 +277,7 @@ export const HYDERABAD_EVENTS: EventItem[] = [
     category: 'Concerts',
     genre: ['Rockstar', 'EDM', 'Tamil/Telugu Rock', 'Live Stadium'],
     venue: 'GMR Arena: 360° Rockstar Stadium',
-    location: 'Shamshabad, Hyderabad',
+    location: 'Airport Approach Road, Shamshabad, Hyderabad',
     city: 'Hyderabad',
     date: 'Sat, 28 Nov • 07:00 PM',
     duration: '3h 45m',
