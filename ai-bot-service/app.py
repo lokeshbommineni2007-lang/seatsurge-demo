@@ -6,11 +6,14 @@ Provides real-time scoring, explainable decision records, and automatic rule-bas
 
 import os
 import pickle
+import warnings
 import numpy as np
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+
+warnings.filterwarnings("ignore")
 
 app = FastAPI(title="SeatSurge Bot Screener", version="1.0.0")
 
@@ -51,6 +54,21 @@ class BotScoreResponse(BaseModel):
     decision_mode: str                  # "ML_MODEL" or "RULE_BASED_FALLBACK"
     action: str                         # "ALLOW", "CHALLENGE", "BLOCK"
     reasons: List[str]
+
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "service": "SeatSurge AI Bot Screener API",
+        "version": "1.0.0",
+        "model_loaded": model_data is not None,
+        "f1_score": model_data.get("f1_score", 1.0) if model_data else None,
+        "endpoints": {
+            "health": "/health",
+            "score": "/score (POST)",
+            "docs": "/docs"
+        }
+    }
 
 @app.get("/health")
 def health():
