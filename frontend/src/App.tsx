@@ -3,6 +3,7 @@ import { Theatre3D, SeatInfo } from './components/Theatre3D';
 import { RockstarArena3D } from './components/RockstarArena3D';
 import { ObservabilityDashboard } from './components/ObservabilityDashboard';
 import { BotChallengeModal } from './components/BotChallengeModal';
+import { WaitingRoom } from './components/WaitingRoom';
 import { HYDERABAD_EVENTS, EventItem } from './utils/mockEvents';
 import { TheatreLayoutId, THEATRE_LAYOUTS, generateTheatreSeats } from './utils/theatreLayouts';
 import { 
@@ -55,6 +56,13 @@ export function App() {
 
   // Confirmed Ticket state
   const [bookedTicket, setBookedTicket] = useState<BookedTicketInfo | null>(null);
+
+  // Anirudh Flash-Sale Virtual Waiting Room Queue State
+  const [isWaitingRoomOpen, setIsWaitingRoomOpen] = useState(false);
+  const [queuePosition, setQueuePosition] = useState(14);
+  const [totalInQueue, setTotalInQueue] = useState(1200);
+  const [queueWaitSeconds, setQueueWaitSeconds] = useState(12);
+  const [isQueueAdmitted, setIsQueueAdmitted] = useState(false);
 
   // Observability & Bot defense
   const [userId] = useState(() => `user-${Math.random().toString(36).substring(2, 9)}`);
@@ -196,6 +204,24 @@ export function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // 5. Anirudh Virtual Waiting Room FIFO Queue progression
+  useEffect(() => {
+    if (!isWaitingRoomOpen || isQueueAdmitted) return;
+    const interval = setInterval(() => {
+      setQueuePosition((prev) => {
+        const next = prev - Math.floor(Math.random() * 3 + 2);
+        if (next <= 1) {
+          setIsQueueAdmitted(true);
+          setQueueWaitSeconds(0);
+          return 1;
+        }
+        setQueueWaitSeconds(Math.max(1, Math.round(next * 1.1)));
+        return next;
+      });
+    }, 1100);
+    return () => clearInterval(interval);
+  }, [isWaitingRoomOpen, isQueueAdmitted]);
+
   // Handle Event Selection -> Advances to Step 2 (DETAIL / SHOWTIME)
   const handleSelectEvent = (event: EventItem) => {
     setSelectedEvent(event);
@@ -203,6 +229,12 @@ export function App() {
       setSelectedTheatre('GMR Arena: 360° Rockstar Stadium');
       setSelectedShowtime('07:00 PM (360° Rockstar Stage)');
       setSelectedLayoutId('CONCERT_STADIUM');
+      setTheatreViewMode('3D_ARENA');
+      setQueuePosition(14);
+      setTotalInQueue(1200);
+      setQueueWaitSeconds(14);
+      setIsQueueAdmitted(false);
+      setIsWaitingRoomOpen(true);
     } else if (event.id === 'scene-2026') {
       setSelectedTheatre('Prasads Multiplex: Screen 4');
       setSelectedShowtime('07:20 PM (Screen 4)');
@@ -226,6 +258,14 @@ export function App() {
 
   // Launch Seating from Detail View -> Advances to Step 3 (SEATS)
   const handleProceedToSeats = () => {
+    if (isConcertEvent && !isQueueAdmitted) {
+      setQueuePosition(8);
+      setTotalInQueue(1200);
+      setQueueWaitSeconds(9);
+      setIsQueueAdmitted(false);
+      setIsWaitingRoomOpen(true);
+      return;
+    }
     setSeatsMap(generateTheatreSeats(selectedLayoutId));
     setSelectedSeats([]);
     setActiveSeatId(null);
@@ -1320,6 +1360,28 @@ export function App() {
           }}
           reasons={botChallenge.reasons}
           riskScore={botChallenge.riskScore}
+        />
+      )}
+
+      {/* ─── Virtual Waiting Room Modal for Anirudh Concert ─── */}
+      {isWaitingRoomOpen && (
+        <WaitingRoom
+          queuePosition={queuePosition}
+          totalInQueue={totalInQueue}
+          estimatedWaitSeconds={queueWaitSeconds}
+          isAdmitted={isQueueAdmitted}
+          title="Rockstar Anirudh: Hukum World Tour"
+          subtitle="GMR Arena 360° Stadium • High Demand Flash-Sale Active • Redis Sorted Sets FIFO Queue"
+          onEnterVenue={() => {
+            setIsWaitingRoomOpen(false);
+            setIsQueueAdmitted(true);
+            setSeatsMap(generateTheatreSeats('CONCERT_STADIUM'));
+            setTheatreViewMode('3D_ARENA');
+            setSelectedSeats([]);
+            setActiveSeatId(null);
+            setCurrentStep('SEATS');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
         />
       )}
     </div>

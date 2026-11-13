@@ -7,6 +7,8 @@ interface WaitingRoomProps {
   estimatedWaitSeconds: number;
   isAdmitted: boolean;
   onEnterVenue: () => void;
+  title?: string;
+  subtitle?: string;
 }
 
 export const WaitingRoom: React.FC<WaitingRoomProps> = ({
@@ -14,7 +16,9 @@ export const WaitingRoom: React.FC<WaitingRoomProps> = ({
   totalInQueue,
   estimatedWaitSeconds,
   isAdmitted,
-  onEnterVenue
+  onEnterVenue,
+  title = "SeatSurge Virtual Waiting Room",
+  subtitle = "High demand flash sale in progress. Enforcing strict FIFO ordering on Redis Sorted Sets to protect downstream instances."
 }) => {
   // Genuine backend-driven calculations with robust fallback handling
   const safeTotal = typeof totalInQueue === 'number' && totalInQueue > 0 ? totalInQueue : 1;
@@ -65,11 +69,11 @@ export const WaitingRoom: React.FC<WaitingRoomProps> = ({
         </div>
 
         <h2 id="waiting-room-title" className="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">
-          Yuktik '26 Virtual Waiting Room
+          {title}
           <Sparkles className="w-4 h-4 text-cyan-400" />
         </h2>
         <p className="text-xs text-slate-400 mb-6">
-          High demand flash sale in progress. Enforcing strict FIFO ordering on Redis Sorted Sets to protect downstream instances.
+          {subtitle}
         </p>
 
         {isAdmitted ? (
