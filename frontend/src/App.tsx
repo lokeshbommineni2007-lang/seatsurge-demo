@@ -14,7 +14,8 @@ import { HYDERABAD_EVENTS, EventItem } from './utils/mockEvents';
 import { TheatreLayoutId, THEATRE_LAYOUTS, generateTheatreSeats } from './utils/theatreLayouts';
 import { Ticket, ArrowLeft, Film, Shield, AlertCircle, Clock, MapPin, LayoutGrid, ArrowRight, Sparkles } from 'lucide-react';
 
-const API_BASE = '/api';
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
+const BOT_SERVICE_URL = (import.meta as any).env?.VITE_BOT_SERVICE_URL || '';
 
 export function App() {
   // Navigation & View Mode
@@ -261,7 +262,8 @@ export function App() {
       const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
       if (mean < 120) {
         try {
-          const botCheckRes = await fetch(`${API_BASE}/bot/check`, {
+          const checkUrl = BOT_SERVICE_URL ? `${BOT_SERVICE_URL}/score` : `${API_BASE}/bot/check`;
+          const botCheckRes = await fetch(checkUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -384,20 +386,25 @@ export function App() {
 
   // Simulate Bot Attack
   const handleSimulateBotAttack = async () => {
-    const res = await fetch(`${API_BASE}/bot/check`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: 'bot-scalper-99',
-        request_rate: 35.0,
-        inter_click_mean_ms: 12.0,
-        inter_click_std_ms: 2.0,
-        mouse_jitter: 0.01,
-        account_age_days: 0.001
-      })
-    });
-    const data = await res.json();
-    alert(`AI Bot Detection Result:\nRisk Score: ${(data.risk_score * 100).toFixed(0)}%\nAction: ${data.action}\nDecision Mode: ${data.decision_mode}\nReasons:\n${data.reasons.join('\n')}`);
+    try {
+      const checkUrl = BOT_SERVICE_URL ? `${BOT_SERVICE_URL}/score` : `${API_BASE}/bot/check`;
+      const res = await fetch(checkUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: 'bot-scalper-99',
+          request_rate: 35.0,
+          inter_click_mean_ms: 12.0,
+          inter_click_std_ms: 2.0,
+          mouse_jitter: 0.01,
+          account_age_days: 0.001
+        })
+      });
+      const data = await res.json();
+      alert(`AI Bot Detection Result:\nRisk Score: ${(data.risk_score * 100).toFixed(0)}%\nAction: ${data.action}\nDecision Mode: ${data.decision_mode}\nReasons:\n${data.reasons.join('\n')}`);
+    } catch (e: any) {
+      alert(`Bot check error: ${e.message}`);
+    }
   };
 
   // Reset Venue
