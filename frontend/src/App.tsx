@@ -9,7 +9,7 @@ import { TheatreLayoutId, THEATRE_LAYOUTS, generateTheatreSeats } from './utils/
 import { 
   Ticket, Film, Shield, AlertCircle, Clock, MapPin, 
   LayoutGrid, ArrowRight, Sparkles, Star, Search, CheckCircle2, 
-  Download, RefreshCw, Box, ChevronRight, Compass, ShieldAlert, X, CreditCard
+  Download, RefreshCw, Box, ChevronRight, Compass, ShieldAlert, X, CreditCard, Eye
 } from 'lucide-react';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
@@ -965,7 +965,64 @@ export function App() {
                   </div>
                 </div>
               ) : (
-                <div className="w-full h-[480px] rounded-2xl overflow-hidden border-2 border-[#e8c5ac] bg-black relative shadow-inner">
+                <div className="w-full h-[520px] rounded-2xl overflow-hidden border-2 border-[#e8c5ac] bg-black relative shadow-inner">
+                  {/* Floating 3D Camera Controls with dedicated Point of View (POV) Button */}
+                  <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2 bg-slate-950/85 backdrop-blur-md p-1.5 rounded-2xl border border-white/20 shadow-xl">
+                    <button
+                      onClick={() => {
+                        if (!activeSeatId && selectedSeats.length > 0) {
+                          setActiveSeatId(selectedSeats[0]);
+                        } else if (!activeSeatId) {
+                          setActiveSeatId(isConcertEvent ? 'D-24' : 'C-6');
+                        }
+                        setCameraMode('POV');
+                      }}
+                      className={`px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 ${
+                        cameraMode === 'POV'
+                          ? 'bg-[#c85a3b] text-white shadow-md'
+                          : 'bg-white/10 text-white hover:bg-white/20'
+                      }`}
+                      title="Experience true cinema perspective directly from the selected seat"
+                    >
+                      <Eye className="w-4 h-4 text-cyan-400" />
+                      <span>Seat POV {activeSeatId ? `(${activeSeatId})` : selectedSeats[0] ? `(${selectedSeats[0]})` : ''}</span>
+                    </button>
+
+                    <button
+                      onClick={() => setCameraMode('OVERVIEW')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                        cameraMode === 'OVERVIEW'
+                          ? 'bg-[#c85a3b] text-white shadow-md'
+                          : 'bg-white/10 text-white hover:bg-white/20'
+                      }`}
+                      title="Switch to full stadium overview perspective"
+                    >
+                      <Compass className="w-4 h-4 text-indigo-400" />
+                      <span>Overview</span>
+                    </button>
+
+                    <button
+                      onClick={() => setCameraMode('AISLE')}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
+                        cameraMode === 'AISLE'
+                          ? 'bg-[#c85a3b] text-white shadow-md'
+                          : 'bg-white/10 text-white hover:bg-white/20'
+                      }`}
+                      title={isConcertEvent ? 'View vantage from Rockstar Center Stage' : 'View from central auditorium aisle'}
+                    >
+                      <Film className="w-4 h-4 text-emerald-400" />
+                      <span>{isConcertEvent ? 'Stage Cam' : 'Aisle Walkway'}</span>
+                    </button>
+                  </div>
+
+                  {/* Active POV Status Pill */}
+                  {cameraMode === 'POV' && (
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 rounded-full bg-slate-950/90 backdrop-blur-md border border-cyan-500/50 text-cyan-300 text-xs font-mono font-bold flex items-center gap-2.5 shadow-2xl">
+                      <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+                      <span>Point of View Angle: Looking from Seat {activeSeatId || selectedSeats[0] || (isConcertEvent ? 'D-24' : 'C-6')}</span>
+                    </div>
+                  )}
+
                   {isConcertEvent ? (
                     <RockstarArena3D
                       seatsMap={seatsMap}
@@ -974,6 +1031,8 @@ export function App() {
                       cameraMode={cameraMode}
                       activeSeatId={activeSeatId}
                       onSetCameraMode={setCameraMode}
+                      eventTitle={selectedEvent.title}
+                      venueName={selectedTheatre}
                     />
                   ) : (
                     <Theatre3D
@@ -983,6 +1042,9 @@ export function App() {
                       cameraMode={cameraMode}
                       activeSeatId={activeSeatId}
                       onSetCameraMode={setCameraMode}
+                      eventTitle={selectedEvent.title}
+                      venueName={selectedTheatre}
+                      layoutId={selectedLayoutId}
                     />
                   )}
                 </div>
@@ -999,13 +1061,26 @@ export function App() {
                     <div className="text-xs font-bold text-[#8c776e] uppercase tracking-wider mb-2">Selected Seats:</div>
                     <div>
                       {selectedSeats.length > 0 ? (
-                        <div className="flex flex-wrap gap-2.5">
-                          {selectedSeats.map((s) => (
-                            <span key={s} className="px-3 py-1.5 bg-[#c85a3b] text-white rounded-xl text-xs font-mono font-black shadow-xs">
-                              {s}
-                            </span>
-                          ))}
-                        </div>
+                        <>
+                          <div className="flex flex-wrap gap-2.5 mb-3">
+                            {selectedSeats.map((s) => (
+                              <span key={s} className="px-3 py-1.5 bg-[#c85a3b] text-white rounded-xl text-xs font-mono font-black shadow-xs">
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => {
+                              setTheatreViewMode('3D_ARENA');
+                              setActiveSeatId(selectedSeats[0]);
+                              setCameraMode('POV');
+                            }}
+                            className="w-full py-2.5 px-4 bg-[#fee2ce] hover:bg-[#fed7be] text-[#c85a3b] border-2 border-[#e8c5ac] rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                          >
+                            <Eye className="w-4 h-4 text-[#c85a3b]" />
+                            <span>View Seat {selectedSeats[0]} Point of View (3D)</span>
+                          </button>
+                        </>
                       ) : (
                         <span className="text-xs text-[#8c776e] font-medium italic">
                           No seats selected yet. Click on the chairs to choose up to 6 seats.

@@ -541,11 +541,23 @@ export const RockstarArena3D: React.FC<RockstarArena3DProps> = ({
   useEffect(() => {
     const state = cameraStateRef.current;
 
-    if (cameraMode === 'POV' && activeSeatId) {
-      const [row, numStr] = activeSeatId.split('-');
-      const rIdx = ROWS.indexOf(row);
-      const sNum = parseInt(numStr, 10);
+    if (cameraMode === 'POV') {
+      const targetSeat = activeSeatId || selectedSeats[0] || 'D-24';
+      let row = 'D';
+      let sNum = 24;
+      if (targetSeat.includes('-')) {
+        const parts = targetSeat.split('-');
+        row = parts[0];
+        sNum = parseInt(parts[1], 10);
+      } else {
+        const match = targetSeat.match(/^([A-Z]+)(\d+)$/);
+        if (match) {
+          row = match[1];
+          sNum = parseInt(match[2], 10);
+        }
+      }
 
+      const rIdx = ROWS.indexOf(row);
       if (rIdx !== -1 && !isNaN(sNum)) {
         const coords = getRockstarSeatCoordinates(rIdx, sNum);
         // Position camera inside the seat at human eye level (+1.3y)
@@ -584,7 +596,7 @@ export const RockstarArena3D: React.FC<RockstarArena3DProps> = ({
       r * Math.sin(phi) * Math.cos(theta)
     );
     state.targetLookAt.set(0, 3.5, 0);
-  }, [cameraMode, activeSeatId]);
+  }, [cameraMode, activeSeatId, selectedSeats]);
 
   // ─── Mouse Orbit & Seat Picking Handlers ────────────────────────────
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {

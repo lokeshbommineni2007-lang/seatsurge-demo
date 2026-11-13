@@ -740,15 +740,33 @@ export const Theatre3D: React.FC<Theatre3DProps> = ({
 
   // Camera Mode Animations
   useEffect(() => {
-    if (cameraMode === 'POV' && activeSeatId) {
-      const idx = seatIdToIndexRef.current.get(activeSeatId);
+    if (cameraMode === 'POV') {
+      const targetSeat = activeSeatId || selectedSeats[0] || 'C-24';
+      // Normalize targetSeat if it's C6 vs C-6
+      let normalizedSeat = targetSeat;
+      if (!targetSeat.includes('-')) {
+        const rowMatch = targetSeat.match(/^([A-Z]+)(\d+)$/);
+        if (rowMatch) {
+          normalizedSeat = `${rowMatch[1]}-${rowMatch[2]}`;
+        }
+      }
+
+      let idx = seatIdToIndexRef.current.get(normalizedSeat);
+      if (idx === undefined) {
+        idx = seatIdToIndexRef.current.get(targetSeat);
+      }
+      if (idx === undefined && seatPositionsRef.current.size > 0) {
+        const entries = Array.from(seatPositionsRef.current.entries());
+        idx = entries[Math.floor(entries.length / 2)][0];
+      }
+
       if (idx !== undefined) {
         const pos = seatPositionsRef.current.get(idx);
         if (pos) {
           // Camera swoops to selected seat eye-level
-          targetCamPosRef.current.set(pos.x, pos.y + 1.0, pos.z);
+          targetCamPosRef.current.set(pos.x, pos.y + 0.9, pos.z);
           // Look straight at movie screen center
-          targetCamLookRef.current.set(0, 20, -50);
+          targetCamLookRef.current.set(0, 18, -50);
         }
       }
     } else if (cameraMode === 'AISLE') {
@@ -759,7 +777,7 @@ export const Theatre3D: React.FC<Theatre3DProps> = ({
       targetCamPosRef.current.set(0, 26, 56);
       targetCamLookRef.current.set(0, 10, -20);
     }
-  }, [cameraMode, activeSeatId]);
+  }, [cameraMode, activeSeatId, selectedSeats]);
 
   return (
     <div className="absolute inset-0 w-full h-full select-none">
