@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: seatsurge-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --save 60 1000
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 1s
+      retries: 3
+
+  app1:
+    build: ./backend
+    container_name: seatsurge-app1
+    environment:
+      - PORT=3001
+      - INSTANCE_ID=app-instance-1
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BOT_SERVICE_URL=http://bot-screener:5001
+    ports:
+      - "3001:3001"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  app2:
+    build: ./backend
+    container_name: seatsurge-app2
+    environment:
+      - PORT=3002
+      - INSTANCE_ID=app-instance-2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BOT_SERVICE_URL=http://bot-screener:5001
+    ports:
+      - "3002:3002"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  bot-screener:
+    build: ./ai-bot-service
+    container_name: seatsurge-bot-screener
+    ports:
+      - "5001:5001"
+
+  nginx:
+    image: nginx:alpine
+    container_name: seatsurge-lb
+    volumes:
+      - ./nginx/nginx-docker.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - app1
+      - app2
