@@ -22,44 +22,150 @@ body {
   overflow-x: hidden;
 }
 
-/* Explicit Clean Borders & Padding */
-.box-border-warm {
-  border: 2px solid #e8c5ac !important;
+/* ─── Hero Section ─── */
+.hero-box {
+  background: linear-gradient(135deg, #fff5ec 0%, #feebdc 50%, #fce3ce 100%);
+  border: 2px solid #e8c5ac;
+  border-radius: 32px;
+  padding: 56px 40px 60px 40px;
+  margin-bottom: 52px;
+  text-align: center;
+  box-shadow: 0 4px 24px -2px rgba(200, 90, 59, 0.08);
 }
 
-.box-border-dashed {
-  border: 2px dashed #e8c5ac !important;
+.hero-search-container {
+  max-width: 680px;
+  margin: 36px auto 0 auto;
+  background: #ffffff;
+  border: 2px solid #e8c5ac;
+  border-radius: 20px;
+  padding: 10px 14px 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
 }
 
-/* Ticket Notches / Cutouts */
-.ticket-notch {
+/* ─── Filter Bar ─── */
+.category-filter-bar {
+  margin-bottom: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ─── Movie Ticket Card ─── */
+.movie-ticket-card {
+  background-color: #fff8f2;
+  border: 2px solid #e8c5ac;
+  border-radius: 32px;
+  padding: 36px 36px 32px 36px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s ease-in-out;
   position: relative;
+  overflow: visible;
 }
 
-.ticket-notch::before,
-.ticket-notch::after {
-  content: '';
+.movie-ticket-card:hover {
+  border-color: #c85a3b;
+  box-shadow: 0 16px 40px rgba(200, 90, 59, 0.12);
+  transform: translateY(-3px);
+}
+
+/* Perforation Divider with Half-Circle Cutouts */
+.ticket-divider-row {
+  position: relative;
+  margin: 28px -36px;
+}
+
+.ticket-dashed-line {
+  border-top: 2px dashed #e8c5ac;
+  width: 100%;
+}
+
+.ticket-hole-left {
   position: absolute;
+  left: -14px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  background-color: #f8f2e8;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  z-index: 10;
-}
-
-.ticket-notch::before {
-  left: -14px;
+  background-color: #f8f2e8;
   border-right: 2px solid #e8c5ac;
+  z-index: 5;
 }
 
-.ticket-notch::after {
+.ticket-hole-right {
+  position: absolute;
   right: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: #f8f2e8;
   border-left: 2px solid #e8c5ac;
+  z-index: 5;
 }
 
-/* Scrollbars */
+/* ─── Step 2 Feature Showcase ─── */
+.feature-dashed-box {
+  border: 2px dashed #e8c5ac;
+  border-radius: 32px;
+  background-color: #fff8f2;
+  padding: 44px;
+  margin-bottom: 48px;
+}
+
+.feature-banner {
+  background: linear-gradient(135deg, #2c1d1a 0%, #422923 50%, #2c1d1a 100%);
+  border: 2px solid #e8c5ac;
+  border-radius: 24px;
+  padding: 44px 48px;
+  margin-bottom: 40px;
+  color: #ffffff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Showtime Slots */
+.showtime-slot {
+  width: 100%;
+  padding: 16px 22px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 2px solid #e8c5ac;
+  background-color: #fff8f2;
+  color: #231815;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 14px;
+}
+
+.showtime-slot:hover {
+  background-color: #fee8d8;
+  border-color: #c85a3b;
+}
+
+.showtime-slot.active {
+  background-color: #c85a3b;
+  color: #ffffff;
+  border-color: #c85a3b;
+  font-weight: 900;
+  box-shadow: 0 4px 16px rgba(200, 90, 59, 0.35);
+}
+
+/* ─── Scrollbars ─── */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -73,14 +179,4 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #c85a3b;
-}
-
-/* Animations */
-@keyframes pulse-gentle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.85; transform: scale(1.02); }
-}
-
-.animate-pulse-gentle {
-  animation: pulse-gentle 3s ease-in-out infinite;
 }

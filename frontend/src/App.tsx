@@ -544,7 +544,7 @@ export function App() {
         <main className="flex-1 max-w-7xl mx-auto px-6 lg:px-8 py-12 w-full">
           
           {/* Hero Banner Card matching Reference Screenshot 5 */}
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#fff5ec] via-[#feebdc] to-[#fce3ce] border-2 border-[#e8c5ac] p-10 sm:p-16 mb-14 shadow-sm text-center">
+          <div className="hero-box">
             
             {/* Bot Protected Pill */}
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#fee2ce] text-[#c85a3b] text-xs font-black tracking-wider uppercase mb-6 border-2 border-[#e8c5ac] shadow-2xs">
@@ -558,12 +558,12 @@ export function App() {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-base sm:text-lg text-[#6e5c54] max-w-2xl mx-auto mb-10 font-medium leading-relaxed">
+            <p className="text-base sm:text-lg text-[#6e5c54] max-w-2xl mx-auto font-medium leading-relaxed">
               Zero double bookings, atomic seat holding with Redis, and lightning-fast 3D auditorium seat selection.
             </p>
 
             {/* Floating Search Bar with generous padding & clean borders */}
-            <div className="max-w-2xl mx-auto bg-white rounded-2xl p-3 pl-6 border-2 border-[#e8c5ac] shadow-md flex items-center justify-between gap-4">
+            <div className="hero-search-container">
               <div className="flex items-center gap-3.5 flex-1 min-w-0">
                 <Search className="w-5 h-5 text-[#8c776e] shrink-0" />
                 <input
@@ -592,7 +592,7 @@ export function App() {
           </div>
 
           {/* Filter Pills & Shows Count with ample margin */}
-          <div className="flex flex-wrap items-center justify-between gap-6 mb-10" id="premieres-grid">
+          <div className="category-filter-bar" id="premieres-grid">
             <div className="flex items-center gap-3 overflow-x-auto pb-1 no-scrollbar">
               {['All Premieres', 'Sci-Fi 3D', 'Thriller', 'Concerts'].map((cat) => (
                 <button
@@ -619,7 +619,7 @@ export function App() {
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
-                className="bg-[#fff8f2] rounded-3xl border-2 border-[#e8c5ac] p-8 sm:p-9 shadow-sm hover:shadow-xl hover:border-[#c85a3b] transition-all flex flex-col justify-between"
+                className="movie-ticket-card"
               >
                 <div>
                   {/* Top Header Tags */}
@@ -681,10 +681,10 @@ export function App() {
 
                 {/* Perforation Ticket Cutout Divider matching Reference Screenshot 7 */}
                 <div>
-                  <div className="relative my-6 -mx-8 sm:-mx-9">
-                    <div className="border-t-2 border-dashed border-[#e8c5ac]" />
-                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#f8f2e8] border-r-2 border-[#e8c5ac]" />
-                    <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#f8f2e8] border-l-2 border-[#e8c5ac]" />
+                  <div className="ticket-divider-row">
+                    <div className="ticket-dashed-line" />
+                    <div className="ticket-hole-left" />
+                    <div className="ticket-hole-right" />
                   </div>
 
                   {/* Card Bottom Row: Language + Book Tickets CTA */}
@@ -713,10 +713,10 @@ export function App() {
         <main className="flex-1 max-w-7xl mx-auto px-6 lg:px-8 py-12 w-full">
           
           {/* Dashed Border Outer Container matching Reference Screenshot 6 & 8 */}
-          <div className="border-2 border-dashed border-[#e8c5ac] rounded-3xl bg-[#fff8f2] p-8 sm:p-12 mb-12 shadow-sm">
+          <div className="feature-dashed-box">
             
             {/* Feature Banner Card */}
-            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-[#2c1d1a] via-[#3d251f] to-[#2c1d1a] border-2 border-[#e8c5ac] p-8 sm:p-12 mb-10 text-white shadow-md">
+            <div className="feature-banner">
               <span className="text-xs font-black text-[#fde4d4] bg-white/10 px-4 py-1.5 rounded-full border border-white/20 inline-block mb-4">
                 {selectedEvent.formats.join(' • ')}
               </span>
@@ -782,11 +782,7 @@ export function App() {
                             setSelectedShowtime(slot.time);
                             setSelectedLayoutId(slot.layout as TheatreLayoutId);
                           }}
-                          className={`w-full p-4.5 rounded-2xl flex items-center justify-between text-left transition-all cursor-pointer border-2 ${
-                            isSelected
-                              ? 'bg-[#c85a3b] text-white border-[#c85a3b] font-black shadow-md'
-                              : 'bg-[#fff8f2] hover:bg-[#fee8d8] text-[#231815] border-[#e8c5ac] font-bold'
-                          }`}
+                          className={`showtime-slot ${isSelected ? 'active' : ''}`}
                         >
                           <span className="text-sm font-bold">{slot.time}</span>
                           <span className="text-sm font-mono font-black">{slot.price}</span>
@@ -1183,10 +1179,10 @@ export function App() {
             </div>
 
             {/* Perforation Ticket Cutout Divider */}
-            <div className="relative my-8 -mx-10 sm:-mx-12">
-              <div className="border-t-2 border-dashed border-[#e8c5ac]" />
-              <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#f8f2e8] border-r-2 border-[#e8c5ac]" />
-              <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#f8f2e8] border-l-2 border-[#e8c5ac]" />
+            <div className="ticket-divider-row">
+              <div className="ticket-dashed-line" />
+              <div className="ticket-hole-left" />
+              <div className="ticket-hole-right" />
             </div>
 
             {/* QR Code Container */}
