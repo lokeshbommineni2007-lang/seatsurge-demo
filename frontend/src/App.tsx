@@ -15,7 +15,7 @@ import { TheatreLayoutId, THEATRE_LAYOUTS, generateTheatreSeats } from './utils/
 import { Ticket, ArrowLeft, Film, Shield, AlertCircle, Clock, MapPin, LayoutGrid, ArrowRight, Sparkles } from 'lucide-react';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
-const BOT_SERVICE_URL = (import.meta as any).env?.VITE_BOT_SERVICE_URL || '';
+const BOT_SERVICE_URL = (import.meta as any).env?.VITE_BOT_SERVICE_URL || 'https://seatsurge-bot-screener.onrender.com';
 
 export function App() {
   // Navigation & View Mode
@@ -433,6 +433,7 @@ export function App() {
           is3DArenaActive={viewMode === '3D_ARENA'}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          onSimulateBotAttack={handleSimulateBotAttack}
         />
       )}
 

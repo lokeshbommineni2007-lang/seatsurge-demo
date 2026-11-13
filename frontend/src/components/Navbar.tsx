@@ -11,6 +11,7 @@ interface NavbarProps {
   is3DArenaActive: boolean;
   searchQuery: string;
   onSearchChange: (q: string) => void;
+  onSimulateBotAttack?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -22,7 +23,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpen3DArena,
   is3DArenaActive,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  onSimulateBotAttack
 }) => {
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const cities = ['Hyderabad', 'Bengaluru', 'Mumbai', 'Delhi-NCR', 'Chennai'];
@@ -144,6 +146,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Shield className="w-4 h-4 text-indigo-400" />
               <span className="hidden lg:inline">Queue Demo</span>
             </button>
+
+            {/* AI Bot Screener Test Button */}
+            {onSimulateBotAttack && (
+              <button
+                onClick={onSimulateBotAttack}
+                className="px-3 py-2.5 bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/35 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm shadow-rose-500/20"
+                title="Test FastAPI Machine Learning Bot Screener on Render"
+              >
+                <Sparkles className="w-4 h-4 text-rose-400 animate-pulse" />
+                <span className="hidden sm:inline">Test AI Bot Screener</span>
+                <span className="sm:hidden">Bot Test</span>
+              </button>
+            )}
 
             {/* User Profile Avatar */}
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition cursor-pointer hover:border-white/20">
