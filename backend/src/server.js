@@ -327,6 +327,115 @@ fastify.post('/api/admin/reset', async () => {
   return { success: true, message: 'Venue reseated with 1,200 seats with realistic booked clusters' };
 });
 
+// ─── GET /api/v1/health ──────────────────────────────────────────────
+fastify.get('/api/v1/health', async (req, reply) => {
+  let redisConnected = false;
+  try {
+    const pong = await redis.ping();
+    redisConnected = pong === 'PONG';
+  } catch (_) {
+    redisConnected = false;
+  }
+
+  return {
+    status: redisConnected ? 'healthy' : 'degraded',
+    instanceId: INSTANCE_ID,
+    uptime: process.uptime(),
+    redis: {
+      connected: redisConnected,
+      status: redisConnected ? 'PONG' : 'UNREACHABLE'
+    },
+    timestamp: new Date().toISOString()
+  };
+});
+
+// ─── GET /api/v1/theatres ────────────────────────────────────────────
+const HYDERABAD_THEATRES = [
+  {
+    id: 'th-001',
+    name: 'Prasads Multiplex',
+    location: 'NTR Gardens, Tank Bund Road, Hyderabad',
+    screens: 9,
+    totalCapacity: 4320,
+    amenities: ['IMAX', 'Dolby Atmos', 'Food Court', 'Parking', '4DX'],
+    coordinates: { lat: 17.4126, lng: 78.4737 }
+  },
+  {
+    id: 'th-002',
+    name: 'Screen 4 Multiplex',
+    location: 'Punjagutta, Hyderabad',
+    screens: 4,
+    totalCapacity: 1800,
+    amenities: ['Dolby Digital', 'Recliner Seats', 'Cafeteria', 'Parking'],
+    coordinates: { lat: 17.4254, lng: 78.4493 }
+  },
+  {
+    id: 'th-003',
+    name: 'ALLU Multiplex',
+    location: 'Jubilee Hills, Hyderabad',
+    screens: 6,
+    totalCapacity: 2640,
+    amenities: ['4K Laser Projection', 'Dolby Atmos', 'Luxury Lounge', 'Parking'],
+    coordinates: { lat: 17.4316, lng: 78.4109 }
+  },
+  {
+    id: 'th-004',
+    name: 'AAA Cinemas',
+    location: 'Kukatpally, Hyderabad',
+    screens: 5,
+    totalCapacity: 2100,
+    amenities: ['Dolby Digital', 'VIP Lounge', 'Food Court', 'Gaming Zone'],
+    coordinates: { lat: 17.4849, lng: 78.3956 }
+  }
+];
+
+fastify.get('/api/v1/theatres', async (req, reply) => {
+  return {
+    success: true,
+    city: 'Hyderabad',
+    count: HYDERABAD_THEATRES.length,
+    theatres: HYDERABAD_THEATRES,
+    fetchedAt: new Date().toISOString()
+  };
+});
+
+// ─── GET /api/v1/pricing/:eventId ───────────────────────────────────
+const PRICING_CATALOGUE = {
+  default: {
+    currency: 'INR',
+    tiers: [
+      { tier: 'SILVER', label: 'Silver',   basePrice: 180, convenienceFee: 20, totalPrice: 200 },
+      { tier: 'GOLD',   label: 'Gold',     basePrice: 280, convenienceFee: 20, totalPrice: 300 },
+      { tier: 'PREMIUM',label: 'Premium',  basePrice: 430, convenienceFee: 20, totalPrice: 450 },
+      { tier: 'VIP',    label: 'VIP/Recliner', basePrice: 580, convenienceFee: 20, totalPrice: 600 }
+    ]
+  }
+};
+
+fastify.get('/api/v1/pricing/:eventId', async (req, reply) => {
+  const { eventId } = req.params;
+
+  if (!eventId || eventId.trim() === '') {
+    reply.status(400);
+    return { success: false, error: 'INVALID_EVENT_ID', message: 'eventId param is required' };
+  }
+
+  // Look up event-specific pricing first, fall back to default catalogue
+  const catalogue = PRICING_CATALOGUE[eventId] || PRICING_CATALOGUE['default'];
+
+  return {
+    success: true,
+    eventId,
+    currency: catalogue.currency,
+    tiers: catalogue.tiers,
+    taxes: {
+      gst: '18%',
+      note: 'GST included in base price'
+    },
+    fetchedAt: new Date().toISOString()
+  };
+});
+
 // ─── Background Hold Expiry Sweeper (Sweeps every 2 seconds) ────────
 function startHoldExpirySweeper() {
   setInterval(async () => {
